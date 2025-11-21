@@ -1,0 +1,47 @@
+[
+  {
+    "name": "بيتزا ",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "كنتاكي",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "سندويشات",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "صاج",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "فنكر",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "ريزو",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "الاضافات",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "المقبلات",
+    "size": "small",
+    "imageUrl": ""
+  },
+  {
+    "name": "وجبات التوفير",
+    "size": "small",
+    "imageUrl": ""
+  }
+]

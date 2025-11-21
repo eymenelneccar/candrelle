@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "autoplay": false,
+  "intervalMs": 4000,
+  "images": [
+    "assets/images/he.png"
+  ],
+  "textEnabled": false,
+  "textContent": "",
+  "buttons": [
+    {
+      "enabled": true,
+      "iconUrl": "info.png",
+      "href": ""
+    },
+    {
+      "enabled": true,
+      "iconUrl": "instagram.png",
+      "href": ""
+    }
+  ]
+}

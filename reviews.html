@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>التقييم | تقييم الخدمة</title>
+  <script>
+    // ضبط رابط Google Apps Script المستخدم كوجهة لاستقبال بيانات التقييم
+    // يمكن تحديثه لاحقًا عبر التخزين المحلي: localStorage.setItem('restaurant_gs_webhook_url', 'https://script.google.com/macros/s/.../exec')
+    window.GS_WEBHOOK_URL = (window.GS_WEBHOOK_URL
+      || localStorage.getItem('restaurant_gs_webhook_url')
+      || 'https://script.google.com/macros/s/AKfycbyaQskDQ_CMv_8OjgT64AYq1tP7XdeP0jULxDFM9sjDjyIGD7LeoSJRfgyC082N3it8WA/exec');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-red: #CC0404;
+      --text-main: #18181b;
+      --radius: 12px;
+      --input-min-h: 48px;
+      --btn-min-h: 48px;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Cairo', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; margin:0; color: var(--text-main); background:#f7f7f7; }
+    .container { width: 100%; max-width: 1060px; margin: 0 auto; padding: 16px; }
+    header { position: sticky; top: 0; z-index: 40; background:#f1f9f9; border-bottom:1px solid #e0e0e0; }
+    .brand { display:flex; align-items:center; justify-content:center; padding: 10px 16px; position: relative; }
+    .brand-title { font-weight: 900; color: var(--main-red); letter-spacing: 1px; font-size: clamp(14px, 4vw, 18px); }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius: var(--radius); box-shadow: 0 6px 24px rgba(0,0,0,0.06); padding:16px; }
+    .section-title { font-size: clamp(18px, 4.8vw, 24px); font-weight:800; color: var(--text-main); border-bottom: 4px solid rgba(204,4,4,0.5); padding-bottom:8px; display:inline-block; margin-bottom:16px; }
+    .item-name { font-weight:800; margin-bottom:8px; }
+    .stars { display:flex; gap: clamp(6px, 3vw, 10px); direction:ltr; justify-content:center; }
+    .star { font-size: clamp(24px, 7vw, 32px); cursor:pointer; color:#d1d5db; transition: transform .12s ease, color .12s ease; padding: 4px; }
+    .star.active { color: var(--main-red); transform: scale(1.06); }
+    .textarea { width:100%; min-height:110px; border:1px solid #d1d5db; border-radius: var(--radius); padding:12px; resize: vertical; background:#fff; font-size:16px; }
+    .input { width:100%; border:1px solid #d1d5db; border-radius: var(--radius); padding:12px; background:#fff; font-size:16px; min-height: var(--input-min-h); }
+    .btn { width:100%; min-height: var(--btn-min-h); padding:10px 14px; border-radius: var(--radius); font-weight:800; cursor:pointer; border:none; font-size:16px; }
+    .btn-primary { background: var(--main-red); color:#fff; }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+    .muted { color:#6b7280; font-size:12px; }
+
+    /* زر الرجوع الفخم */
+    .back-btn {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+      color: var(--text-main);
+      border: 1.5px solid #cc0404;
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+      transition: box-shadow 200ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease;
+    }
+    .back-btn .icon {
+      font-size: 16px;
+      line-height: 1;
+      color: #cc0404;
+      transition: transform 150ms ease, color 200ms ease;
+    }
+    .back-btn:hover {
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+      background: #cc0404;
+      color: #ffffff;
+      border-color: #a60303;
+    }
+    .back-btn:hover .icon { color: #ffffff; transform: translateX(-2px); }
+    .back-btn:active { box-shadow: 0 8px 18px rgba(0,0,0,0.10); }
+    /* تحسينات الهاتف */
+    @media (max-width: 768px) {
+      .container { padding: 12px; }
+      .card { padding: 12px; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 12px; }
+      .back-btn { left: 8px; top: 50%; transform: translateY(-50%); padding: 6px 10px; }
+      .back-btn .icon { font-size: 16px; }
+      .back-btn .label { font-size: 14px; }
+    }
+    @media (max-width: 360px) {
+      .star { font-size: 24px; }
+      .section-title { font-size: 18px; }
+      .brand-title { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <a href="#" id="back-btn" class="back-btn" role="button" aria-label="رجوع"><span class="icon">←</span><span class="label">رجوع</span></a>
+      <span class="brand-title">مربط واسطبل الاصيل</span>
+    </div>
+  </header>
+  <main class="container">
+    <h1 class="section-title">قيّم خدمتنا</h1>
+
+    <div class="card" id="service-form">
+      <div class="item-name">كم نجمة تعطينا للخدمة؟</div>
+      <div id="service-stars" class="stars" aria-label="تقييم الخدمة">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
+      </div>
+      <div style="margin-top:10px; display:grid; gap:8px;">
+        <input id="name" class="input" type="text" placeholder="الاسم الكامل (إجباري)" required />
+        <input id="phone" class="input" type="tel" inputmode="tel" placeholder="رقم الهاتف (إجباري)" required />
+        <textarea id="comment" class="textarea" placeholder="اكتب رأيك باختصار (إجباري)" required></textarea>
+        <button id="submit" class="btn btn-primary" disabled>أرسل التقييم</button>
+        <span class="muted" id="hint">الحقول جميعها مطلوبة.</span>
+      </div>
+    </div>
+
+    
+  </main>
+
+  <script>
+    // حدد قاعدة الـ API:
+    // أولوية القراءة: ?apiBase في رابط الصفحة > التخزين المحلي > كشف النطاق
+    const params = new URLSearchParams(location.search);
+    const apiBaseFromQuery = (params.get('apiBase') || '').trim();
+    const API_BASE = (
+      apiBaseFromQuery ||
+      (localStorage.getItem('restaurant_api_base') || '').trim() ||
+      ((location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.endsWith('onrender.com'))
+        ? ''
+        : 'https://alaseel.onrender.com')
+    ).replace(/\/+$/, '');
+    try { console.debug('Using API_BASE:', API_BASE || '(relative)'); } catch {}
+    const REVIEWS_ENDPOINT = `${API_BASE}/api/save-review`;
+    let serviceRating = 0;
+
+    function highlight(container, n) {
+      container.querySelectorAll('.star').forEach(s => s.classList.toggle('active', Number(s.dataset.value) <= n));
+    }
+
+    const ARABIC_INDIC = '٠١٢٣٤٥٦٧٨٩';
+    const PERSIAN_INDIC = '۰۱۲۳۴۵۶۷۸۹';
+    function toAsciiDigits(str) {
+      return String(str || '').replace(/[٠-٩۰-۹]/g, (ch) => {
+        const i1 = ARABIC_INDIC.indexOf(ch);
+        if (i1 !== -1) return String(i1);
+        const i2 = PERSIAN_INDIC.indexOf(ch);
+        if (i2 !== -1) return String(i2);
+        return ch;
+      });
+    }
+    function normalizePhone(raw) {
+      // حوّل الأرقام العربية/الفارسية وازل الفراغات والشرطات والأقواس
+      return toAsciiDigits(String(raw || '')).replace(/[\s\-()]+/g, '');
+    }
+
+    function isValidPhone(phone) {
+      const d = normalizePhone(phone);
+      return /^\+?\d{7,15}$/.test(d);
+    }
+
+    function updateSubmitState() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+      const btn = document.getElementById('submit');
+      const ok = !!name && !!comment && isValidPhone(phone) && serviceRating > 0;
+      btn.disabled = !ok;
+      const hint = document.getElementById('hint');
+      if (!ok) {
+        if (!isValidPhone(phone)) {
+          hint.textContent = 'أدخل رقم هاتف صحيح باستخدام أرقام 0-9 أو ٠-٩';
+        } else {
+          hint.textContent = 'الحقول جميعها مطلوبة.';
+        }
+      } else {
+        hint.textContent = 'جاهز للإرسال.';
+      }
+    }
+
+    document.querySelectorAll('#service-stars .star').forEach(star => {
+      star.addEventListener('mouseenter', () => highlight(document.getElementById('service-stars'), Number(star.dataset.value)));
+      star.addEventListener('click', () => {
+        serviceRating = Number(star.dataset.value);
+        highlight(document.getElementById('service-stars'), serviceRating);
+        updateSubmitState();
+      });
+    });
+
+    document.getElementById('name').addEventListener('input', updateSubmitState);
+    document.getElementById('phone').addEventListener('input', updateSubmitState);
+    document.getElementById('comment').addEventListener('input', updateSubmitState);
+
+    async function sendReviewToGoogleSheets(payloadObj) {
+      try {
+        const hook = window.GS_WEBHOOK_URL || '';
+        if (!hook) return false;
+
+        // حاول أولاً عبر البروكسي المحلي لتجنب CORS والحصول على حالة واضحة
+        try {
+          const resp = await fetch(`${API_BASE}/api/forward-webhook`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: hook, data: payloadObj }),
+            keepalive: true
+          });
+          if (resp.ok) return true; // نجح، لا ترسل عبر مسارات أخرى
+        } catch {}
+
+        // سقوط احتياطي متعدد: جرّب sendBeacon، ثم fetch no-cors، ثم GET عبر صورة (pixel)
+        try {
+          const payload = JSON.stringify(payloadObj);
+          const blob = new Blob([payload], { type: 'application/json' });
+          let dispatched = false;
+          try {
+            dispatched = navigator.sendBeacon(hook, blob) || dispatched;
+          } catch {}
+          try {
+            fetch(hook, { method: 'POST', body: payload, mode: 'no-cors', keepalive: true }).catch(() => {});
+            dispatched = true;
+          } catch {}
+          if (!dispatched) {
+            try {
+              const q = (hook.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(payload) + '&t=' + Date.now();
+              const img = new Image();
+              img.src = hook + q;
+              dispatched = true;
+            } catch {}
+          }
+          if (dispatched) return true;
+        } catch {}
+        return false;
+      } catch (e) {
+        console.warn('فشل إرسال التقييم إلى Google Sheets بشكل غير حاجز', e);
+        return false;
+      }
+    }
+
+    document.getElementById('submit').addEventListener('click', async () => {
+      const btn = document.getElementById('submit');
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+      if (!name || !comment || !isValidPhone(phone) || serviceRating === 0) {
+        updateSubmitState();
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'جاري الإرسال...';
+      try {
+        const payload = {
+          type: 'service',
+          serviceRating: serviceRating,
+          comment: comment,
+          customerName: name,
+          customerPhone: phone,
+          timestamp: new Date().toISOString(),
+          submissionId: (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : ('sub-' + Date.now() + '-' + Math.random().toString(16).slice(2)))
+        };
+        // حاول الحفظ محليًا أولاً
+        let saveOk = false;
+        try {
+          const resp = await fetch(REVIEWS_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+          saveOk = !!resp.ok;
+        } catch {}
+
+        // أرسل إلى Google Sheets بغضّ النظر عن نجاح الحفظ المحلي
+        const forwardedOk = await sendReviewToGoogleSheets(payload);
+
+        if (saveOk) {
+          btn.textContent = 'تم الحفظ ✓';
+          btn.disabled = true;
+        } else if (forwardedOk) {
+          btn.textContent = 'تم الإرسال ✓';
+          btn.disabled = true;
+        } else {
+          throw new Error('تعذر الإرسال');
+        }
+      } catch (e) {
+        btn.textContent = 'حدث خطأ';
+        btn.disabled = false;
+      }
+    });
+    // زر رجوع في الترويسة
+    const backBtn = document.getElementById('back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

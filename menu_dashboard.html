@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم القائمة - تخزين محلي مع أصول JSON</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+  <style>
+    :root { --color-primary: #5A3920; --color-secondary: #C7A78A; }
+    body { font-family: 'Cairo', sans-serif; background-color: #F8F5F2; color: #333; }
+    .text-primary { color: var(--color-primary); }
+    .bg-primary { background-color: var(--color-primary); }
+    .bg-secondary { background-color: var(--color-secondary); }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+  <header class="mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-primary">لوحة تحكم القائمة</h1>
+        <p class="text-gray-600">المصدر: localStorage مع ملفات الأصول في <code>assets/</code></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnAdd" class="px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90">إضافة صنف</button>
+        <button id="btnSave" class="px-4 py-2 rounded-lg border">حفظ الأصناف</button>
+        <button id="btnImport" class="px-4 py-2 rounded-lg border">استيراد JSON</button>
+        <button id="btnExportGoogle" class="px-4 py-2 rounded-lg bg-green-600 text-white">إرسال إلى Google</button>
+      </div>
+    </div>
+    <!-- تبويبات الأقسام -->
+    <nav id="tabs" class="mt-4 flex flex-wrap gap-2">
+      <button data-tab="items" class="px-3 py-2 rounded-lg bg-secondary text-white">الأصناف</button>
+      <button data-tab="quickinput" class="px-3 py-2 rounded-lg border">الإدخال السريع</button>
+      <button data-tab="categories" class="px-3 py-2 rounded-lg border">الفئات</button>
+      <button data-tab="settings" class="px-3 py-2 rounded-lg border">الإعدادات</button>
+      <button data-tab="theme" class="px-3 py-2 rounded-lg border">الثيم</button>
+      <button data-tab="announcements" class="px-3 py-2 rounded-lg border">الإعلانات</button>
+      <button data-tab="hero" class="px-3 py-2 rounded-lg border">الهيرو</button>
+      <button data-tab="qr" class="px-3 py-2 rounded-lg border">رمز QR</button>
+    </nav>
+  </header>
+
+  <main class="max-w-6xl mx-auto">
+    <!-- قسم الأصناف -->
+    <section id="tab-items">
+      <div id="itemsGrid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+      <p id="emptyMsg" class="text-center text-gray-500 mt-8 hidden">لا توجد فئات أو أصناف بعد. استخدم زر "إضافة فئة" أو "إضافة صنف" للبدء.</p>
+    </section>
+
+    <!-- الإدخال السريع من نص -->
+    <section id="tab-quickinput" class="hidden">
+      <h2 class="text-2xl font-bold text-primary mb-4">الإدخال السريع من نص</h2>
+      <div class="p-4 bg-yellow-100 border border-yellow-300 rounded-xl text-sm leading-7 mb-4">
+        <p class="font-bold">ÖNEMLİ NOT: Metinden-menü oluşturmak için satır satır menünüzü yazmanız ve satır başlarına içeriğin tipine göre belirli sembolleri koymanız gerekmektedir.</p>
+        <p class="mt-2">İçerik Sembolleri ×</p>
+        <p class="mt-2">Aşağıdaki sembolleri satır başına koyarak, o satırdaki menü içeriğini tanımlayabilirsiniz.</p>
+        <p class="mt-2">Sadece fiyat bilgisi satır başına eklenmez! Ürün başlığı veya alt çeşit başlığı yazıldıktan sonra <code>---</code> ile aynı satırda yazılır.</p>
+        <ul class="list-disc pr-6 mt-2">
+          <li>Bölüm Başlık: <code>###</code></li>
+          <li>Bölüm içi alt Başlık: <code>##</code></li>
+          <li>Ürün Adı: <code>#</code></li>
+          <li>Ürün Fiyatı: <code>---</code></li>
+          <li>Ürün Açıklama: <code>></code></li>
+        </ul>
+      </div>
+      <textarea id="quickInputText" rows="16" class="w-full border rounded-lg px-3 py-2 font-mono" placeholder="### Pizzalar\n## Klasik Lezzetler\n# Margarita --- 155\n> İnce hamur, taze mozzarella, domates sosu\n# Pepperoni --- 225\n> Bol pepperoni dilimleri"></textarea>
+      <div class="flex items-center gap-3 mt-3">
+        <label class="flex items-center gap-2 text-sm"><input id="quickReplaceMode" type="checkbox" class="scale-125">استبدال القائمة الحالية بالكامل</label>
+        <div class="flex-1"></div>
+        <button id="btnQuickParse" class="px-4 py-2 rounded-lg bg-primary text-white">تحويل النص إلى أصناف</button>
+        <button id="btnQuickClear" class="px-4 py-2 rounded-lg border">مسح النص</button>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">يدعم الرموز: <code>###</code>, <code>##</code>, <code>#</code>, <code>---</code>, <code>></code> كما هو موضح أعلاه.</p>
+    </section>
+
+    <!-- قسم الفئات -->
+    <section id="tab-categories" class="hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold text-primary">إدارة الفئات</h2>
+        <div class="flex gap-2">
+          <button id="btnAddCategory" class="px-3 py-2 rounded-lg bg-primary text-white">إضافة فئة</button>
+          <button id="btnSaveCategories" class="px-3 py-2 rounded-lg border">حفظ الفئات</button>
+        </div>
+      </div>
+      <div id="categoriesList" class="space-y-4"></div>
+      <p class="text-xs text-gray-500 mt-2">اختَر حجم الفئة لضبط شكل بطاقة العرض في القائمة.</p>
+    </section>
+
+    <!-- قسم الإعدادات -->
+    <section id="tab-settings" class="hidden">
+      <h2 class="text-2xl font-bold text-primary mb-4">إعدادات الموقع والطلبات</h2>
+      <form id="settingsForm" class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">رقم واتساب للطلبات</label>
+          <input id="whatsappNumber" type="tel" class="w-full border rounded-lg px-3 py-2" placeholder="05xxxxxxxx أو 9665xxxxxxxx">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">رقم اتصال مباشر</label>
+          <input id="contactNumber" type="tel" class="w-full border rounded-lg px-3 py-2" placeholder="05xxxxxxxx">
+        </div>
+        <div class="sm:col-span-1">
+          <label class="block text-sm text-gray-700 mb-1">اسم الموقع</label>
+          <input id="locationName" type="text" class="w-full border rounded-lg px-3 py-2" placeholder="مثال: فرع العليا">
+        </div>
+        <div class="sm:col-span-1">
+          <label class="block text-sm text-gray-700 mb-1">رابط خريطة (Google Maps)</label>
+          <input id="mapLink" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://maps.google.com/...">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm text-gray-700 mb-1">رابط Google Apps Script (Web App)</label>
+          <input id="googleSheetsWebhookUrl" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://script.google.com/macros/s/.../exec">
+          <p class="text-xs text-gray-500 mt-1">انسخ رابط النشر للويب آب من Apps Script واضعه هنا لاستقبال الطلبات في Google Sheets.</p>
+        </div>
+        <div class="sm:col-span-2 flex items-center gap-3 mt-2">
+          <input id="ordersEnabled" type="checkbox" class="scale-125">
+          <label for="ordersEnabled" class="text-gray-700">تفعيل استقبال الطلبات أونلاين</label>
+        </div>
+        <div class="sm:col-span-2 flex justify-end">
+          <button id="btnSaveSettings" type="button" class="px-4 py-2 rounded-lg bg-primary text-white">حفظ الإعدادات</button>
+        </div>
+      </form>
+      <hr class="my-6 border-t" />
+      <h3 class="text-xl font-bold text-primary mb-2">إعدادات الفروع</h3>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <!-- فرع الصدر -->
+        <div class="p-4 border rounded-xl bg-white">
+          <h4 class="font-bold mb-3">فرع الصدر</h4>
+          <label class="block text-sm text-gray-700 mb-1">اسم العرض</label>
+          <input id="branch-alsider-locationName" type="text" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="فرع الصدر">
+          <label class="block text-sm text-gray-700 mb-1">رقم واتساب</label>
+          <input id="branch-alsider-whatsapp" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx أو 9665xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رقم اتصال</label>
+          <input id="branch-alsider-contact" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رابط الخريطة</label>
+          <input id="branch-alsider-map" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://maps.google.com/...">
+        </div>
+
+        <!-- فرع الزعفرانية -->
+        <div class="p-4 border rounded-xl bg-white">
+          <h4 class="font-bold mb-3">فرع الزعفرانية</h4>
+          <label class="block text-sm text-gray-700 mb-1">اسم العرض</label>
+          <input id="branch-alzafranye-locationName" type="text" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="فرع الزعفرانية">
+          <label class="block text-sm text-gray-700 mb-1">رقم واتساب</label>
+          <input id="branch-alzafranye-whatsapp" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx أو 9665xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رقم اتصال</label>
+          <input id="branch-alzafranye-contact" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رابط الخريطة</label>
+          <input id="branch-alzafranye-map" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://maps.google.com/...">
+        </div>
+
+        <!-- فرع الدورة -->
+        <div class="p-4 border rounded-xl bg-white">
+          <h4 class="font-bold mb-3">فرع الدورة</h4>
+          <label class="block text-sm text-gray-700 mb-1">اسم العرض</label>
+          <input id="branch-aldwra-locationName" type="text" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="فرع الدورة">
+          <label class="block text-sm text-gray-700 mb-1">رقم واتساب</label>
+          <input id="branch-aldwra-whatsapp" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx أو 9665xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رقم اتصال</label>
+          <input id="branch-aldwra-contact" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رابط الخريطة</label>
+          <input id="branch-aldwra-map" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://maps.google.com/...">
+        </div>
+
+        <!-- فرع البلديات -->
+        <div class="p-4 border rounded-xl bg-white">
+          <h4 class="font-bold mb-3">فرع البلديات</h4>
+          <label class="block text-sm text-gray-700 mb-1">اسم العرض</label>
+          <input id="branch-albalafiyat-locationName" type="text" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="فرع البلديات">
+          <label class="block text-sm text-gray-700 mb-1">رقم واتساب</label>
+          <input id="branch-albalafiyat-whatsapp" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx أو 9665xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رقم اتصال</label>
+          <input id="branch-albalafiyat-contact" type="tel" class="w-full border rounded-lg px-3 py-2 mb-2" placeholder="05xxxxxxxx">
+          <label class="block text-sm text-gray-700 mb-1">رابط الخريطة</label>
+          <input id="branch-albalafiyat-map" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://maps.google.com/...">
+        </div>
+      </div>
+    </section>
+
+    <!-- قسم الثيم -->
+    <section id="tab-theme" class="hidden">
+      <h2 class="text-2xl font-bold text-primary mb-4">الثيم</h2>
+      <form id="themeForm" class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون الخط</label>
+          <input id="themeTextColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون الخلفية</label>
+          <input id="themeBgColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون الفاصل تحت "الفئات"</label>
+          <input id="themeDividerColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون زر السهم (الرجوع)</label>
+          <input id="themeBackButtonColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون شريط القائمة السفلي</label>
+          <input id="themeNavBgColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون خلفية الإعلان النصي</label>
+          <input id="themeTextAdBgColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون خط الايتيمات</label>
+          <input id="themeItemNameColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون خط الفئات</label>
+          <input id="themeCategoryTitleColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون خلفية بطاقة الايتم</label>
+          <input id="themeItemCardBgColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون وصف الايتم</label>
+          <input id="themeItemDescriptionColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون السعر</label>
+          <input id="themeItemPriceColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">لون زر الإضافة للسلة</label>
+          <input id="themeAddToCartBgColor" type="color" class="w-24 h-10 border rounded">
+        </div>
+        <div class="sm:col-span-2 flex justify-end">
+          <button id="btnSaveTheme" type="button" class="px-4 py-2 rounded-lg bg-primary text-white">حفظ الثيم</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- قسم الإعلانات -->
+    <section id="tab-announcements" class="hidden">
+      <h2 class="text-2xl font-bold text-primary mb-4">الإعلانات</h2>
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div class="p-4 bg-white rounded-xl shadow">
+          <h3 class="text-lg font-bold text-primary mb-2">الإعلان الضخم (صورة فقط)</h3>
+          <div class="space-y-2">
+            <label class="block text-sm text-gray-700">تفعيل</label>
+            <input id="megaEnabled" type="checkbox" class="scale-125">
+            <label class="block text-sm text-gray-700">رابط الصورة</label>
+            <input id="megaImageUrl" type="text" class="w-full border rounded-lg px-3 py-2" placeholder="https://... أو assets/images/...">
+            <div class="flex items-center gap-2">
+              <button id="btnUploadMegaImage" type="button" class="px-3 py-2 rounded-lg border">رفع صورة</button>
+              <span id="megaUploadStatus" class="text-xs text-gray-500"></span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">لا يوجد عنوان ولا رابط؛ الإعلان صورة فقط.</p>
+          </div>
+        </div>
+        <div class="p-4 bg-white rounded-xl shadow">
+          <h3 class="text-lg font-bold text-primary mb-2">الإعلان النصي</h3>
+          <div class="space-y-2">
+            <label class="block text-sm text-gray-700">تفعيل</label>
+            <input id="textEnabled" type="checkbox" class="scale-125">
+            <label class="block text-sm text-gray-700">النص</label>
+            <textarea id="textContent" rows="5" class="w-full border rounded-lg px-3 py-2"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button id="btnSaveAnnouncements" class="px-4 py-2 rounded-lg bg-primary text-white">حفظ الإعلانات</button>
+      </div>
+    </section>
+
+    <!-- قسم الهيرو -->
+    <section id="tab-hero" class="hidden">
+      <h2 class="text-2xl font-bold text-primary mb-4">الهيرو</h2>
+      <div class="grid sm:grid-cols-2 gap-6">
+        <div class="p-4 bg-white rounded-xl shadow space-y-3">
+          <div class="flex items-center gap-2">
+            <input id="heroEnabled" type="checkbox" class="scale-125">
+            <label for="heroEnabled" class="text-gray-700">تفعيل الهيرو</label>
+          </div>
+          <p class="text-sm text-gray-600">يمكنك الآن إضافة نص يظهر فوق صورة الهيرو.</p>
+          <div class="flex items-center gap-2">
+            <input id="heroAutoplay" type="checkbox" class="scale-125">
+            <label for="heroAutoplay" class="text-gray-700">تشغيل تلقائي للصور</label>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">الفاصل الزمني (ms أو ثواني)</label>
+            <input id="heroIntervalMs" type="number" min="0" step="100" class="w-full border rounded-lg px-3 py-2" placeholder="4000">
+            <p class="text-xs text-gray-500 mt-1">إذا كتبت رقمًا صغيرًا مثل 5 يُفسَّر كثواني.</p>
+          </div>
+          <div class="space-y-2 mt-2">
+            <h3 class="text-lg font-bold text-primary">نص فوق الهيرو</h3>
+            <label class="flex items-center gap-2 text-sm"><input id="heroTextEnabled" type="checkbox" class="scale-125">تفعيل النص أعلى الهيرو</label>
+            <textarea id="heroTextContent" rows="3" class="w-full border rounded-lg px-3 py-2" placeholder="مثال: أهلاً وسهلاً بكم في مطعمنا"></textarea>
+            <p class="text-xs text-gray-500">سيُعرض هذا النص كشريط لطيف فوق صورة الهيرو.</p>
+          </div>
+          <div class="space-y-2 mt-4">
+            <h3 class="text-lg font-bold text-primary">أزرار الهيرو</h3>
+            <div class="grid grid-cols-1 gap-3">
+              <div class="p-3 border rounded-lg">
+                <label class="flex items-center gap-2 text-sm"><input id="heroBtn1Enabled" type="checkbox" class="scale-125">تفعيل زر 1</label>
+                <label class="block text-sm text-gray-700 mb-1">أيقونة الزر 1</label>
+                <div class="flex items-center gap-2">
+                  <input id="heroBtn1IconUrl" type="text" class="flex-1 border rounded-lg px-3 py-2" placeholder="info.png أو assets/images/...">
+                  <button id="btnUploadHeroBtn1Icon" type="button" class="px-3 py-2 rounded-lg border">رفع أيقونة</button>
+                  <span id="heroBtn1UploadStatus" class="text-xs text-gray-500"></span>
+                </div>
+                <label class="block text-sm text-gray-700 mb-1 mt-2">رابط عند الضغط (اختياري)</label>
+                <input id="heroBtn1Href" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://...">
+              </div>
+              <div class="p-3 border rounded-lg">
+                <label class="flex items-center gap-2 text-sm"><input id="heroBtn2Enabled" type="checkbox" class="scale-125">تفعيل زر 2</label>
+                <label class="block text-sm text-gray-700 mb-1">أيقونة الزر 2</label>
+                <div class="flex items-center gap-2">
+                  <input id="heroBtn2IconUrl" type="text" class="flex-1 border rounded-lg px-3 py-2" placeholder="instagram.png أو assets/images/...">
+                  <button id="btnUploadHeroBtn2Icon" type="button" class="px-3 py-2 rounded-lg border">رفع أيقونة</button>
+                  <span id="heroBtn2UploadStatus" class="text-xs text-gray-500"></span>
+                </div>
+                <label class="block text-sm text-gray-700 mb-1 mt-2">رابط عند الضغط (اختياري)</label>
+                <input id="heroBtn2Href" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://...">
+              </div>
+            </div>
+            <p class="text-xs text-gray-500">تكون الأزرار شفافة فوق صورة الهيرو، ويمكن تعطيلها أو تغيير الأيقونات والروابط من هنا.</p>
+          </div>
+          <div class="flex justify-end">
+            <button id="btnSaveHero" class="px-4 py-2 rounded-lg bg-primary text-white">حفظ الهيرو</button>
+          </div>
+        </div>
+        <div class="p-4 bg-white rounded-xl shadow">
+          <h3 class="text-lg font-bold text-primary mb-2">الصور</h3>
+          <div class="flex items-center gap-2 mb-3">
+            <input id="heroImageUrlInput" type="text" class="flex-1 border rounded-lg px-3 py-2" placeholder="https://... أو assets/images/...">
+            <button id="btnAddHeroImage" class="px-3 py-2 rounded-lg border">إضافة</button>
+            <button id="btnUploadHeroImage" class="px-3 py-2 rounded-lg border">رفع صورة</button>
+            <span id="heroUploadStatus" class="text-xs text-gray-500"></span>
+          </div>
+          <ul id="heroImagesList" class="space-y-2"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- قسم QR -->
+    <section id="tab-qr" class="hidden">
+      <h2 class="text-2xl font-bold text-primary mb-4">رمز الاستجابة السريعة (QR)</h2>
+      <div class="grid sm:grid-cols-2 gap-6 items-start">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">رابط القائمة</label>
+          <input id="menuUrl" type="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://example.com/index.html">
+          <div class="flex items-center gap-2 mt-3">
+            <button id="btnGenerateQR" class="px-4 py-2 rounded-lg bg-primary text-white">توليد QR</button>
+            <button id="btnPrintQR" class="px-4 py-2 rounded-lg border">طباعة</button>
+          </div>
+        </div>
+        <div class="p-4 bg-white rounded-xl shadow">
+          <div id="qrContainer" class="flex items-center justify-center min-h-[220px]"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- نافذة نموذج إضافة/تعديل -->
+  <div id="editModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-xl mx-auto mt-16 bg-white rounded-xl shadow-lg overflow-y-auto max-h-[85vh]">
+      <div class="px-6 py-4 border-b sticky top-0 bg-white z-10">
+        <h2 id="modalTitle" class="text-xl font-bold text-primary">إضافة صنف</h2>
+      </div>
+      <form id="itemForm" class="p-6 space-y-4">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">اسم الصنف</label>
+            <input id="fName" type="text" required class="w-full border rounded-lg px-3 py-2" placeholder="مثال: القهوة التركية" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">الفئة</label>
+            <select id="fCategory" class="w-full border rounded-lg px-3 py-2">
+              <option>القهوة</option>
+              <option>الشاي</option>
+              <option>العصائر</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">السعر (ريال)</label>
+            <input id="fPrice" type="number" min="0" step="1" required class="w-full border rounded-lg px-3 py-2" placeholder="مثال: 18" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">رابط الصورة (اختياري)</label>
+            <input id="fImage" type="text" inputmode="url" class="w-full border rounded-lg px-3 py-2" placeholder="https://... أو assets/images/…" />
+            <div class="flex items-center gap-2 mt-2">
+              <button type="button" id="btnUploadImage" class="px-3 py-2 rounded-lg border">رفع صورة</button>
+              <span id="uploadStatus" class="text-xs text-gray-500"></span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">اختر ملف صورة وسيتم رفعه ثم إدراج مساره تلقائيًا.</p>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">الوصف</label>
+          <textarea id="fDesc" rows="3" class="w-full border rounded-lg px-3 py-2" placeholder="وصف قصير للصنف"></textarea>
+        </div>
+        <!-- محرر الأحجام/المتغيرات -->
+        <div class="border rounded-lg p-3">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-bold text-primary">أحجام وأسعار (اختياري)</h3>
+            <button type="button" id="btnAddVariant" class="px-2 py-1 rounded-lg border text-sm">إضافة حجم</button>
+          </div>
+          <p class="text-xs text-gray-500 mb-2">مثال: صغير / وسط / كبير مع سعر لكل حجم. إن وُجدت أحجام فستظهر الأزرار في القائمة مباشرة لإضافة الحجم المطلوب للسلة.</p>
+          <div id="variantsList" class="space-y-2"></div>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" id="btnCancel" class="px-4 py-2 rounded-lg border">إلغاء</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تأكيد الحذف -->
+  <div id="confirmModal" class="fixed inset-0 hidden bg-black/40 backdrop-blur-sm">
+    <div class="w-full max-w-md mx-auto mt-32 bg-white rounded-xl shadow-lg overflow-hidden">
+      <div class="px-6 py-4 border-b">
+        <h3 class="text-lg font-bold text-primary">تأكيد الحذف</h3>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-700">هل تريد بالتأكيد حذف هذا الصنف؟ لا يمكن التراجع عن هذه العملية.</p>
+        <div class="flex items-center justify-end gap-3 mt-6">
+          <button type="button" id="btnCancelDelete" class="px-4 py-2 rounded-lg border">إلغاء</button>
+          <button type="button" id="btnConfirmDelete" class="px-4 py-2 rounded-lg bg-red-600 text-white">حذف</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'menu_assets';
+    const API_BASE = (location.protocol === 'file:' ? 'http://localhost:8080' : location.origin);
+    const ASSETS_BASE = (location.protocol === 'file:' ? (API_BASE + '/assets') : 'assets');
+    const SAVE_ENDPOINT = API_BASE + '/api/save-menu';
+    const UPLOAD_ENDPOINT = API_BASE + '/api/upload-image';
+    const EXPORT_TO_GOOGLE_ENDPOINT = API_BASE + '/api/export-to-google';
+
+    const defaultItems = [
+      {
+        id: Date.now() - 1,
+        name: 'القهوة التركية',
+        category: 'القهوة',
+        price: 18,
+        description: 'قهوة قوية بطابع شرقي، تُحضّر على نار هادئة مع رغوة خفيفة.',
+        imageUrl: 'https://placehold.co/400x300/5A3920/FFFFFF?text=تركية'
+      },
+      {
+        id: Date.now(),
+        name: 'شاي مثلج بالخوخ',
+        category: 'الشاي',
+        price: 18,
+        description: 'حلو وبارد، مثالي لتهدئة الأعصاب في الأجواء الحارة.',
+        imageUrl: 'https://placehold.co/400x300/F5CBA7/5A3920?text=شاي+مثلج'
+      }
+    ];
+
+    let items = [];
+    let editingId = null;
+    let pendingDeleteId = null;
+
+    const els = {
+      grid: document.getElementById('itemsGrid'),
+      empty: document.getElementById('emptyMsg'),
+      btnAdd: document.getElementById('btnAdd'),
+      btnSave: document.getElementById('btnSave'),
+      btnImport: document.getElementById('btnImport'),
+      btnExportGoogle: document.getElementById('btnExportGoogle'),
+      fileInput: (() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.className = 'hidden';
+        document.body.appendChild(input);
+        return input;
+      })(),
+      editModal: document.getElementById('editModal'),
+      modalTitle: document.getElementById('modalTitle'),
+      form: document.getElementById('itemForm'),
+      fName: document.getElementById('fName'),
+      fCategory: document.getElementById('fCategory'),
+      fPrice: document.getElementById('fPrice'),
+      fImage: document.getElementById('fImage'),
+      fDesc: document.getElementById('fDesc'),
+      variantsList: document.getElementById('variantsList'),
+      btnAddVariant: document.getElementById('btnAddVariant'),
+      btnCancel: document.getElementById('btnCancel'),
+      confirmModal: document.getElementById('confirmModal'),
+      btnCancelDelete: document.getElementById('btnCancelDelete'),
+      btnConfirmDelete: document.getElementById('btnConfirmDelete'),
+      btnUploadImage: document.getElementById('btnUploadImage'),
+      uploadStatus: document.getElementById('uploadStatus'),
+      imageFileInput: (() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.className = 'hidden';
+        document.body.appendChild(input);
+        return input;
+      })()
+    };
+
+    // متغيرات النموذج للأحجام
+    let formVariants = [];
+
+    function renderVariantsEditor() {
+      if (!els.variantsList) return;
+      els.variantsList.innerHTML = '';
+      if (!Array.isArray(formVariants)) formVariants = [];
+      formVariants.forEach((v, idx) => {
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-12 items-center gap-2';
+        row.innerHTML = `
+          <input type="text" class="col-span-5 border rounded-lg px-3 py-2 variant-name" placeholder="الحجم" value="${(v.name||'').replace(/"/g, '&quot;')}">
+          <input type="number" min="0" step="1" class="col-span-4 border rounded-lg px-3 py-2 variant-price" placeholder="السعر" value="${Number(v.price||0)}">
+          <button type="button" class="col-span-3 px-3 py-2 rounded-lg bg-red-600 text-white variant-delete">حذف</button>
+        `;
+        els.variantsList.appendChild(row);
+        const nameI = row.querySelector('.variant-name');
+        const priceI = row.querySelector('.variant-price');
+        const delBtn = row.querySelector('.variant-delete');
+        nameI.addEventListener('input', (e) => { formVariants[idx].name = e.target.value; });
+        priceI.addEventListener('input', (e) => { formVariants[idx].price = Number(e.target.value||0); });
+        delBtn.addEventListener('click', () => { formVariants.splice(idx, 1); renderVariantsEditor(); });
+      });
+      // زر إضافة
+      if (els.btnAddVariant && !els.btnAddVariant.dataset.boundVariants) {
+        els.btnAddVariant.addEventListener('click', () => { formVariants.push({ name: '', price: 0 }); renderVariantsEditor(); });
+        els.btnAddVariant.dataset.boundVariants = '1';
+      }
+    }
+
+    async function loadData() {
+      // حمّل من ملف الأصول أولاً ليكون المصدر الموثوق
+      try {
+        const resp = await fetch(`${ASSETS_BASE}/menu.json`, { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (Array.isArray(data)) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            return data;
+          }
+        }
+      } catch {}
+      // ثم جرّب التخزين المحلي كحل احتياطي
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch {}
+      // أخيراً استخدم البيانات الافتراضية
+      return [...defaultItems];
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function renderItems() {
+      els.grid.innerHTML = '';
+      // تحضير قائمة الفئات: استخدم الفئات المضافة إن وُجدت، وإلا اشتقها من الأصناف
+      const categoryList = (Array.isArray(categories) && categories.length)
+        ? categories.map(c => ({ name: (c.name||'').trim() || 'غير مصنف', imageUrl: c.imageUrl || '' }))
+        : Array.from(new Set(items.map(i => (i.category||'').trim() || 'غير مصنف'))).map(n => ({ name: n, imageUrl: '' }));
+
+      if (!categoryList.length) {
+        els.empty.classList.remove('hidden');
+        return;
+      }
+      els.empty.classList.add('hidden');
+
+      categoryList.forEach(cat => {
+        const itemsForCat = items.filter(x => ((x.category||'').trim() || 'غير مصنف') === cat.name);
+        const block = document.createElement('div');
+        block.className = 'bg-white rounded-xl shadow-md p-4';
+        block.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <img src="${cat.imageUrl || 'https://placehold.co/64x64/cccccc/333?text=IMG'}" alt="${cat.name}" class="w-12 h-12 object-cover rounded-lg border" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333?text=IMG'">
+              <h3 class="text-xl font-bold text-primary">${cat.name}</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600">${itemsForCat.length} صنف</span>
+              <button class="px-3 py-1 rounded-lg border" data-action="add-item" data-category="${cat.name}">إضافة صنف</button>
+              <button class="px-3 py-1 rounded-lg bg-secondary text-white" data-action="toggle" data-category="${cat.name}">عرض/إخفاء</button>
+            </div>
+          </div>
+        `;
+
+        const panel = document.createElement('div');
+        panel.className = 'mt-3 hidden category-items';
+        panel.setAttribute('data-category', cat.name);
+
+        if (!itemsForCat.length) {
+          const empty = document.createElement('p');
+          empty.className = 'text-sm text-gray-500';
+          empty.textContent = 'لا توجد أصناف في هذه الفئة.';
+          panel.appendChild(empty);
+        } else {
+          itemsForCat.forEach(item => {
+            // عنصر فاصل بصري (عنوان فرعي داخل الفئة)
+            if (item && item.type === 'subheading') {
+              const div = document.createElement('div');
+              div.className = 'bg-gray-100 rounded-xl border p-3 flex items-center justify-between';
+              div.innerHTML = `
+                <span class="text-primary font-semibold">${item.name}</span>
+                <button class="px-3 py-1 rounded-lg bg-red-600 text-white" data-action="delete" data-id="${item.id}">حذف</button>
+              `;
+              panel.appendChild(div);
+              return;
+            }
+            const card = document.createElement('div');
+            card.className = 'bg-gray-50 rounded-xl border p-3 flex flex-col';
+            card.innerHTML = `
+              <div class="flex items-start gap-3">
+                <img src="${item.imageUrl || 'https://placehold.co/128x96/cccccc/333?text=صورة'}" alt="${item.name}" class="w-32 h-24 object-cover rounded-lg border" />
+                <div class="flex-1">
+                  <h4 class="text-lg font-bold text-primary mb-1">${item.name}</h4>
+                  <p class="text-sm text-gray-600 mb-1">${item.description || ''}</p>
+                  <span class="text-base font-semibold text-gray-800">${item.price} ريال</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-end gap-2 border-t pt-3 mt-2">
+                <button class="px-3 py-1 rounded-lg border" data-action="edit" data-id="${item.id}">تعديل</button>
+                <button class="px-3 py-1 rounded-lg bg-red-600 text-white" data-action="delete" data-id="${item.id}">حذف</button>
+              </div>
+            `;
+            panel.appendChild(card);
+          });
+        }
+
+        block.appendChild(panel);
+        els.grid.appendChild(block);
+      });
+    }
+
+    function openEditModal(item) {
+      els.modalTitle.textContent = item ? 'تعديل صنف' : 'إضافة صنف';
+      editingId = item ? item.id : null;
+      els.fName.value = item?.name || '';
+      els.fCategory.value = item?.category || 'القهوة';
+      els.fPrice.value = item?.price != null ? item.price : '';
+      els.fImage.value = item?.imageUrl || '';
+      els.fDesc.value = item?.description || '';
+      formVariants = Array.isArray(item?.variants) ? item.variants.map(v => ({ name: v.name||'', price: Number(v.price||0) })) : [];
+      renderVariantsEditor();
+      els.editModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      els.editModal.classList.add('hidden');
+      editingId = null;
+      els.form.reset();
+      formVariants = [];
+    }
+
+    function openConfirmDelete(id) {
+      pendingDeleteId = id;
+      els.confirmModal.classList.remove('hidden');
+    }
+
+    function closeConfirmDelete() {
+      pendingDeleteId = null;
+      els.confirmModal.classList.add('hidden');
+    }
+
+    // حفظ البيانات مباشرة إلى ملف الأصول عبر خادم محلي
+    async function saveToServer() {
+      const original = els.btnSave.textContent;
+      els.btnSave.textContent = 'جارِ الحفظ...';
+      els.btnSave.disabled = true;
+      try {
+        const resp = await fetch(SAVE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(items)
+        });
+        if (!resp.ok) throw new Error('فشل الحفظ');
+        els.btnSave.textContent = 'تم الحفظ ✓';
+        setTimeout(() => { els.btnSave.textContent = original; }, 1500);
+      } catch (e) {
+        console.warn(e);
+        els.btnSave.textContent = 'خطأ في الحفظ';
+        setTimeout(() => { els.btnSave.textContent = original; }, 2500);
+      } finally {
+        els.btnSave.disabled = false;
+      }
+    }
+
+    // حفظ تلقائي (مع إلغاء الاهتزاز) عند تعديل الأصناف
+    let saveItemsTimer = null;
+    function scheduleSaveItems() {
+      try { clearTimeout(saveItemsTimer); } catch {}
+      saveItemsTimer = setTimeout(() => { saveToServer(); }, 800);
+    }
+
+    // رفع صورة وإدراج مسارها تلقائيًا في الحقل
+    function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadImageFile(file) {
+      if (!file) return;
+      const original = els.uploadStatus.textContent;
+      els.uploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, data: dataUrl })
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        els.fImage.value = json.path;
+        els.uploadStatus.textContent = 'تم الرفع ✓';
+        // إذا كنا نعدل صنفًا قائمًا، احفظ الصورة مباشرةً ضمن العنصر واحفظ إلى الخادم
+        if (editingId != null) {
+          items = items.map(x => x.id === editingId ? { ...x, imageUrl: els.fImage.value.trim() } : x);
+          saveData();
+          renderItems();
+          scheduleSaveItems();
+        }
+      } catch (e) {
+        console.warn('خطأ رفع الصورة', e);
+        els.uploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => { els.uploadStatus.textContent = original || ''; }, 2000);
+        els.imageFileInput.value = '';
+      }
+    }
+
+    // استيراد بيانات JSON من ملف محلي
+    function importJson() {
+      els.fileInput.onchange = async () => {
+        const file = els.fileInput.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (Array.isArray(data)) {
+            items = data;
+            saveData();
+            renderItems();
+          }
+        } catch (e) {
+          console.warn('ملف JSON غير صالح', e);
+        } finally {
+          els.fileInput.value = '';
+        }
+      };
+      els.fileInput.click();
+    }
+
+    // أحداث عامة
+    els.btnAdd.addEventListener('click', () => openEditModal(null));
+    els.btnSave.addEventListener('click', saveToServer);
+    els.btnImport.addEventListener('click', importJson);
+    els.btnUploadImage.addEventListener('click', () => els.imageFileInput.click());
+    els.imageFileInput.addEventListener('change', () => uploadImageFile(els.imageFileInput.files[0]));
+    els.btnCancel.addEventListener('click', closeEditModal);
+    els.btnCancelDelete.addEventListener('click', closeConfirmDelete);
+    els.btnConfirmDelete.addEventListener('click', () => {
+      if (pendingDeleteId == null) return;
+      items = items.filter(x => x.id !== pendingDeleteId);
+      saveData();
+      renderItems();
+      scheduleSaveItems();
+      closeConfirmDelete();
+    });
+
+    els.grid.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const action = btn.getAttribute('data-action');
+      if (action === 'toggle') {
+        const parent = btn.closest('.bg-white.rounded-xl.shadow-md.p-4') || btn.closest('.bg-white');
+        const panel = parent ? parent.querySelector('.category-items') : null;
+        if (panel) panel.classList.toggle('hidden');
+        return;
+      }
+      if (action === 'add-item') {
+        const catName = btn.getAttribute('data-category') || '';
+        openEditModal(null);
+        if (els.fCategory) {
+          // حاول اختيار الفئة المطابقة إن كانت موجودة ضمن الخيارات
+          const match = [...els.fCategory.options].find(o => o.value === catName);
+          if (match) els.fCategory.value = catName;
+        }
+        return;
+      }
+      const id = Number(btn.getAttribute('data-id'));
+      const item = items.find(x => x.id === id);
+      if (action === 'edit') {
+        openEditModal(item);
+      } else if (action === 'delete') {
+        openConfirmDelete(id);
+      }
+    });
+
+    els.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = els.fName.value.trim();
+      const category = els.fCategory.value.trim();
+      const price = Number(els.fPrice.value);
+      const imageUrl = els.fImage.value.trim();
+      const description = els.fDesc.value.trim();
+
+      if (!name || Number.isNaN(price)) return;
+
+      if (editingId != null) {
+        items = items.map(x => x.id === editingId ? { ...x, name, category, price, imageUrl, description, variants: [...formVariants] } : x);
+      } else {
+        const id = Date.now() + Math.floor(Math.random() * 1000);
+        items.push({ id, name, category, price, imageUrl, description, variants: [...formVariants] });
+      }
+
+      saveData();
+      renderItems();
+      // حفظ تلقائي بعد إضافة/تعديل الصنف
+      scheduleSaveItems();
+      closeEditModal();
+    });
+
+    // بدء التشغيل
+    (async () => {
+      items = await loadData();
+      renderItems();
+    })();
+    // ===== أقسام إضافية: الفئات / الإعدادات / الإعلانات / QR =====
+    const SAVE_CATEGORIES_ENDPOINT = API_BASE + '/api/save-categories';
+    const SAVE_SETTINGS_ENDPOINT = API_BASE + '/api/save-settings';
+    const SAVE_ANNOUNCEMENTS_ENDPOINT = API_BASE + '/api/save-announcements';
+    const SAVE_HERO_ENDPOINT = API_BASE + '/api/save-hero';
+
+    let categories = [];
+    let settings = {
+      whatsappNumber: '', contactNumber: '', locationName: '', mapLink: '', ordersEnabled: false,
+      theme: {
+        textColor: '#111827', bgColor: '#ffffff', dividerColor: '#2563EB', backButtonColor: '#374151',
+        navBgColor: '#0f172a', textAdBgColor: '#0b2545', itemNameColor: '#ffffff', categoryTitleColor: '#2563EB',
+        itemCardBgColor: '#374151', itemDescriptionColor: '#D1D5DB', itemPriceColor: '#93C5FD', addToCartBgColor: '#2563EB'
+      },
+      branches: {
+        alsider: { locationName: 'فرع الصدر', whatsappNumber: '', contactNumber: '', mapLink: '' },
+        alzafranye: { locationName: 'فرع الزعفرانية', whatsappNumber: '', contactNumber: '', mapLink: '' },
+        aldwra: { locationName: 'فرع الدورة', whatsappNumber: '', contactNumber: '', mapLink: '' },
+        albalafiyat: { locationName: 'فرع البلديات', whatsappNumber: '', contactNumber: '', mapLink: '' }
+      }
+    };
+    let announcements = { megaEnabled: false, megaTitle: '', megaImageUrl: '', megaLink: '', textEnabled: false, textContent: '' };
+
+    const tabsNav = document.getElementById('tabs');
+    const sections = {
+      items: document.getElementById('tab-items'),
+      quickinput: document.getElementById('tab-quickinput'),
+      categories: document.getElementById('tab-categories'),
+      settings: document.getElementById('tab-settings'),
+      theme: document.getElementById('tab-theme'),
+      announcements: document.getElementById('tab-announcements'),
+      hero: document.getElementById('tab-hero'),
+      qr: document.getElementById('tab-qr')
+    };
+    function showTab(tab) {
+      Object.keys(sections).forEach(k => sections[k].classList.toggle('hidden', k !== tab));
+      tabsNav.querySelectorAll('button').forEach(b => {
+        const active = b.getAttribute('data-tab') === tab;
+        b.classList.toggle('bg-secondary', active);
+        b.classList.toggle('text-white', active);
+        b.classList.toggle('border', !active);
+      });
+    }
+    tabsNav.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-tab]');
+      if (!btn) return;
+      showTab(btn.getAttribute('data-tab'));
+    });
+
+    // ===== الإدخال السريع من نص =====
+    (function setupQuickInput(){
+      const area = document.getElementById('quickInputText');
+      const btnParse = document.getElementById('btnQuickParse');
+      const btnClear = document.getElementById('btnQuickClear');
+      const replaceMode = document.getElementById('quickReplaceMode');
+      if (!area || !btnParse) return;
+
+      function parsePrice(str) {
+        if (!str) return 0;
+        const m = String(str).match(/-?\d+(?:[.,]\d+)?/);
+        return m ? Number(m[0].replace(',', '.')) : 0;
+      }
+
+      function parseQuickText(text) {
+        const lines = String(text || '').split(/\r?\n/);
+        let currentCategory = 'غير مصنف';
+        let currentSub = '';
+        const outItems = [];
+        const cats = new Set();
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (!line) continue;
+          // أمر تعيين الفئة: "<اسم> خليهم"
+          const setCat = line.match(/^(.+?)\s+خليهم\s*$/);
+          if (setCat) { currentCategory = (setCat[1] || '').trim() || currentCategory; cats.add(currentCategory); continue; }
+          if (/^###\s*/.test(line)) { currentCategory = line.replace(/^###\s*/, '').trim() || currentCategory; cats.add(currentCategory); continue; }
+          if (/^##\s*/.test(line)) { 
+            currentSub = line.replace(/^##\s*/, '').trim();
+            // أضِف فاصل بصري كعنصر خاص ضمن نفس الفئة
+            outItems.push({ id: Date.now() + Math.floor(Math.random()*100000) + i, type: 'subheading', name: currentSub, category: currentCategory || 'غير مصنف' });
+            continue; 
+          }
+          if (/^#\s*/.test(line)) {
+            const raw = line.replace(/^#\s*/, '');
+            const parts = raw.split(/---|—/);
+            const name = (parts[0] || '').trim();
+            const price = parsePrice(parts[1] || '');
+            let desc = '';
+            let j = i + 1;
+            while (j < lines.length && lines[j].trim().startsWith('>')) {
+              desc += (desc ? ' ' : '') + lines[j].trim().replace(/^>\s*/, '');
+              j++;
+            }
+            // أدعم المتغيرات بصيغة "-- اسم --- سعر" بعد سطر المنتج
+            let consumed = false;
+            while (j < lines.length) {
+              const vline = lines[j].trim();
+              const vm = vline.match(/^--\s*(.+?)\s*(?:---|—)\s*(.+)\s*$/);
+              if (!vm) break;
+              const vName = (vm[1] || '').trim();
+              const vPrice = parsePrice(vm[2] || '');
+              outItems.push({ id: Date.now() + Math.floor(Math.random()*100000) + j, name: `${name} (${vName})`, category: currentCategory || 'غير مصنف', price: vPrice, description: desc, imageUrl: '' });
+              j++;
+              consumed = true;
+            }
+            // إن لم توجد متغيرات، أضف المنتج الأساسي إن كان له سعر أو وصف
+            if (!consumed) {
+              outItems.push({ id: Date.now() + Math.floor(Math.random()*100000) + j, name, category: currentCategory || 'غير مصنف', price, description: desc, imageUrl: '' });
+            }
+            i = j - 1;
+            continue;
+          }
+          // تجاهل أي خطوط لا تبدأ بالرموز المحددة
+        }
+        return { items: outItems, categories: Array.from(cats) };
+      }
+
+      async function applyQuickParse() {
+        const text = area.value || '';
+        const { items: parsedItems, categories: parsedCats } = parseQuickText(text);
+        if (!parsedItems.length) { alert('لم يتم العثور على أصناف صالحة في النص.'); return; }
+        if (replaceMode && replaceMode.checked) {
+          items = parsedItems;
+        } else {
+          items = Array.isArray(items) ? [...items, ...parsedItems] : parsedItems;
+        }
+        // إدراج الفئات الجديدة إن لم تكن موجودة
+        if (Array.isArray(parsedCats) && parsedCats.length) {
+          categories = Array.isArray(categories) ? categories : [];
+          parsedCats.forEach(name => {
+            const n = (name || '').trim();
+            if (!n) return;
+            if (!categories.some(c => (c.name || '').trim() === n)) {
+              categories.push({ name: n, size: 'small', imageUrl: '' });
+            }
+          });
+          renderCategories();
+          buildCategoryOptions();
+          try {
+            await fetch(SAVE_CATEGORIES_ENDPOINT, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(categories)
+            });
+          } catch (e) {}
+        }
+        saveData();
+        renderItems();
+        showTab('items');
+      }
+
+      btnParse.addEventListener('click', applyQuickParse);
+      if (btnClear) btnClear.addEventListener('click', () => { area.value = ''; });
+    })();
+
+    // ===== تحميل الفئات =====
+    async function loadCategoriesData() {
+      try {
+        const resp = await fetch(`${ASSETS_BASE}/categories.json`, { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (Array.isArray(data)) return data;
+        }
+      } catch {}
+      return [];
+    }
+
+    // عناصر واجهة الفئات
+    const catsEls = {
+      list: document.getElementById('categoriesList'),
+      btnAdd: document.getElementById('btnAddCategory'),
+      btnSave: document.getElementById('btnSaveCategories'),
+      uploadInput: (() => { const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.className = 'hidden'; document.body.appendChild(i); return i; })()
+    };
+
+    function renderCategories() {
+      catsEls.list.innerHTML = '';
+      if (!categories.length) {
+        const empty = document.createElement('p');
+        empty.className = 'text-center text-gray-500';
+        empty.textContent = 'لا توجد فئات بعد. استخدم زر "إضافة فئة".';
+        catsEls.list.appendChild(empty);
+        return;
+      }
+      categories.forEach((cat, idx) => {
+        const row = document.createElement('div');
+        row.className = 'bg-white rounded-xl shadow p-4 flex items-start justify-between gap-4';
+        row.innerHTML = `
+          <div class="flex items-start gap-3 flex-1">
+            <img src="${cat.imageUrl || 'https://placehold.co/64x64/cccccc/333?text=IMG'}" alt="${cat.name || ''}" class="w-16 h-16 object-cover rounded-lg border" onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333?text=IMG'">
+            <div class="grid sm:grid-cols-2 gap-3 flex-1">
+              <div>
+                <label class="block text-sm text-gray-700 mb-1">اسم الفئة</label>
+                <input type="text" class="w-full border rounded-lg px-3 py-2 cat-name" value="${cat.name || ''}">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-700 mb-1">حجم الفئة</label>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button type="button" data-size="small" class="size-btn ${((cat.size === 1) || (cat.size === 'small')) ? 'bg-secondary text-white' : 'border'} px-3 py-2 rounded">صغير</button>
+                  <button type="button" data-size="large" class="size-btn ${((cat.size === 2) || (cat.size === 'large')) ? 'bg-secondary text-white' : 'border'} px-3 py-2 rounded">كبير</button>
+                  <button type="button" data-size="wide" class="size-btn ${(cat.size === 'wide') ? 'bg-secondary text-white' : 'border'} px-3 py-2 rounded">كبير بس عرضي</button>
+                  <button type="button" data-size="xsmall" class="size-btn ${(cat.size === 'xsmall') ? 'bg-secondary text-white' : 'border'} px-3 py-2 rounded">صغير جدًا</button>
+                </div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-sm text-gray-700 mb-1">رابط الصورة</label>
+                <input type="text" class="w-full border rounded-lg px-3 py-2 cat-img" value="${cat.imageUrl || ''}" placeholder="https://... أو assets/images/...">
+                <button type="button" data-action="upload" class="mt-2 px-3 py-2 rounded-lg border">رفع صورة</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <button type="button" data-action="delete" class="px-3 py-2 rounded-lg bg-red-600 text-white">حذف</button>
+          </div>
+        `;
+        catsEls.list.appendChild(row);
+        // أحداث الحجم
+        row.querySelectorAll('.size-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            categories[idx].size = btn.getAttribute('data-size');
+            renderCategories();
+            buildCategoryOptions();
+            scheduleSaveCategories();
+          });
+        });
+        // اسم وصورة
+        row.querySelector('.cat-name').addEventListener('input', (e) => {
+          categories[idx].name = e.target.value;
+          buildCategoryOptions();
+          scheduleSaveCategories();
+        });
+        row.querySelector('.cat-img').addEventListener('input', (e) => {
+          categories[idx].imageUrl = e.target.value;
+          scheduleSaveCategories();
+        });
+        // رفع صورة
+        row.querySelector('[data-action="upload"]').addEventListener('click', () => {
+          catsEls.uploadInput.onchange = async () => {
+            const file = catsEls.uploadInput.files[0];
+            if (!file) return;
+            try {
+              const dataUrl = await fileToDataURL(file);
+              const resp = await fetch(UPLOAD_ENDPOINT, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: file.name, data: dataUrl })
+              });
+              const json = await resp.json().catch(() => ({}));
+              if (resp.ok && json.ok && json.path) {
+                categories[idx].imageUrl = json.path;
+                renderCategories();
+                scheduleSaveCategories();
+              }
+            } finally {
+              catsEls.uploadInput.value = '';
+            }
+          };
+          catsEls.uploadInput.click();
+        });
+        // حذف
+        row.querySelector('[data-action="delete"]').addEventListener('click', () => {
+          categories.splice(idx, 1);
+          renderCategories();
+          buildCategoryOptions();
+          scheduleSaveCategories();
+        });
+      });
+    }
+
+    function addCategory() {
+      categories.push({ name: '', size: 'small', imageUrl: '' });
+      renderCategories();
+      buildCategoryOptions();
+      scheduleSaveCategories();
+    }
+
+    async function saveCategoriesToServer() {
+      const original = catsEls.btnSave.textContent;
+      catsEls.btnSave.textContent = 'جارِ الحفظ...';
+      catsEls.btnSave.disabled = true;
+      try {
+        const resp = await fetch(SAVE_CATEGORIES_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(categories)
+        });
+        if (!resp.ok) throw new Error('فشل الحفظ');
+        catsEls.btnSave.textContent = 'تم الحفظ ✓';
+        setTimeout(() => { catsEls.btnSave.textContent = original; }, 1500);
+      } catch (e) {
+        catsEls.btnSave.textContent = 'خطأ في الحفظ';
+        setTimeout(() => { catsEls.btnSave.textContent = original; }, 2500);
+      } finally {
+        catsEls.btnSave.disabled = false;
+      }
+    }
+
+    function buildCategoryOptions() {
+      if (!els.fCategory) return;
+      const current = els.fCategory.value;
+      els.fCategory.innerHTML = '';
+      categories.filter(c => c.name && c.name.trim()).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.name.trim();
+        opt.textContent = c.name.trim();
+        els.fCategory.appendChild(opt);
+      });
+      // الحفاظ على القيمة السابقة إن كانت موجودة
+      if ([...els.fCategory.options].some(o => o.value === current)) {
+        els.fCategory.value = current;
+      }
+    }
+
+    catsEls.btnAdd.addEventListener('click', addCategory);
+    catsEls.btnSave.addEventListener('click', saveCategoriesToServer);
+
+    // ===== تصدير كل البيانات إلى Google Apps Script =====
+    async function exportAllToGoogle() {
+      const original = els.btnExportGoogle.textContent;
+      els.btnExportGoogle.textContent = 'جارِ الإرسال...';
+      els.btnExportGoogle.disabled = true;
+      try {
+        const payload = {
+          menu: Array.isArray(items) ? items : [],
+          categories: Array.isArray(categories) ? categories : [],
+          settings: settings || {},
+          announcements: announcements || {},
+          hero: hero || {}
+        };
+        const resp = await fetch(EXPORT_TO_GOOGLE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || json.ok === false) throw new Error(json.error || 'فشل الإرسال');
+        els.btnExportGoogle.textContent = 'تم الإرسال ✓';
+        setTimeout(() => { els.btnExportGoogle.textContent = original; }, 2000);
+      } catch (e) {
+        console.error(e);
+        alert('حدث خطأ أثناء الإرسال: ' + (e && e.message || 'غير معروف'));
+        els.btnExportGoogle.textContent = original;
+      } finally {
+        els.btnExportGoogle.disabled = false;
+      }
+    }
+    if (els.btnExportGoogle) els.btnExportGoogle.addEventListener('click', exportAllToGoogle);
+
+    // حفظ تلقائي للفئات (مع إلغاء الاهتزاز)
+    let saveCatsTimer = null;
+    function scheduleSaveCategories() {
+      try { clearTimeout(saveCatsTimer); } catch {}
+      saveCatsTimer = setTimeout(() => { saveCategoriesToServer(); }, 800);
+    }
+
+    // ===== الإعدادات =====
+    const settingsEls = {
+      whatsappNumber: document.getElementById('whatsappNumber'),
+      contactNumber: document.getElementById('contactNumber'),
+      locationName: document.getElementById('locationName'),
+      mapLink: document.getElementById('mapLink'),
+      googleSheetsWebhookUrl: document.getElementById('googleSheetsWebhookUrl'),
+      ordersEnabled: document.getElementById('ordersEnabled'),
+      btnSave: document.getElementById('btnSaveSettings')
+    };
+    const branchEls = {
+      alsider: {
+        locationName: document.getElementById('branch-alsider-locationName'),
+        whatsapp: document.getElementById('branch-alsider-whatsapp'),
+        contact: document.getElementById('branch-alsider-contact'),
+        map: document.getElementById('branch-alsider-map')
+      },
+      alzafranye: {
+        locationName: document.getElementById('branch-alzafranye-locationName'),
+        whatsapp: document.getElementById('branch-alzafranye-whatsapp'),
+        contact: document.getElementById('branch-alzafranye-contact'),
+        map: document.getElementById('branch-alzafranye-map')
+      },
+      aldwra: {
+        locationName: document.getElementById('branch-aldwra-locationName'),
+        whatsapp: document.getElementById('branch-aldwra-whatsapp'),
+        contact: document.getElementById('branch-aldwra-contact'),
+        map: document.getElementById('branch-aldwra-map')
+      },
+      albalafiyat: {
+        locationName: document.getElementById('branch-albalafiyat-locationName'),
+        whatsapp: document.getElementById('branch-albalafiyat-whatsapp'),
+        contact: document.getElementById('branch-albalafiyat-contact'),
+        map: document.getElementById('branch-albalafiyat-map')
+      }
+    };
+    const themeEls = {
+      textColor: document.getElementById('themeTextColor'),
+      bgColor: document.getElementById('themeBgColor'),
+      dividerColor: document.getElementById('themeDividerColor'),
+      backButtonColor: document.getElementById('themeBackButtonColor'),
+      navBgColor: document.getElementById('themeNavBgColor'),
+      textAdBgColor: document.getElementById('themeTextAdBgColor'),
+      itemNameColor: document.getElementById('themeItemNameColor'),
+      categoryTitleColor: document.getElementById('themeCategoryTitleColor'),
+      itemCardBgColor: document.getElementById('themeItemCardBgColor'),
+      itemDescriptionColor: document.getElementById('themeItemDescriptionColor'),
+      itemPriceColor: document.getElementById('themeItemPriceColor'),
+      addToCartBgColor: document.getElementById('themeAddToCartBgColor'),
+      btnSave: document.getElementById('btnSaveTheme')
+    };
+
+    async function loadSettingsData() {
+      try {
+        const resp = await fetch(`${ASSETS_BASE}/settings.json`, { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          return { ...settings, ...(data || {}) };
+        }
+      } catch {}
+      return { ...settings };
+    }
+
+    function applySettingsToForm() {
+      settingsEls.whatsappNumber.value = settings.whatsappNumber || '';
+      settingsEls.contactNumber.value = settings.contactNumber || '';
+      settingsEls.locationName.value = settings.locationName || '';
+      settingsEls.mapLink.value = settings.mapLink || '';
+      if (settingsEls.googleSheetsWebhookUrl) settingsEls.googleSheetsWebhookUrl.value = settings.googleSheetsWebhookUrl || '';
+      settingsEls.ordersEnabled.checked = !!settings.ordersEnabled;
+      const b = settings.branches || {};
+      if (branchEls.alsider.locationName) branchEls.alsider.locationName.value = b.alsider?.locationName || 'فرع الصدر';
+      if (branchEls.alsider.whatsapp) branchEls.alsider.whatsapp.value = b.alsider?.whatsappNumber || '';
+      if (branchEls.alsider.contact) branchEls.alsider.contact.value = b.alsider?.contactNumber || '';
+      if (branchEls.alsider.map) branchEls.alsider.map.value = b.alsider?.mapLink || '';
+      if (branchEls.alzafranye.locationName) branchEls.alzafranye.locationName.value = b.alzafranye?.locationName || 'فرع الزعفرانية';
+      if (branchEls.alzafranye.whatsapp) branchEls.alzafranye.whatsapp.value = b.alzafranye?.whatsappNumber || '';
+      if (branchEls.alzafranye.contact) branchEls.alzafranye.contact.value = b.alzafranye?.contactNumber || '';
+      if (branchEls.alzafranye.map) branchEls.alzafranye.map.value = b.alzafranye?.mapLink || '';
+      if (branchEls.aldwra.locationName) branchEls.aldwra.locationName.value = b.aldwra?.locationName || 'فرع الدورة';
+      if (branchEls.aldwra.whatsapp) branchEls.aldwra.whatsapp.value = b.aldwra?.whatsappNumber || '';
+      if (branchEls.aldwra.contact) branchEls.aldwra.contact.value = b.aldwra?.contactNumber || '';
+      if (branchEls.aldwra.map) branchEls.aldwra.map.value = b.aldwra?.mapLink || '';
+      if (branchEls.albalafiyat.locationName) branchEls.albalafiyat.locationName.value = b.albalafiyat?.locationName || 'فرع البلديات';
+      if (branchEls.albalafiyat.whatsapp) branchEls.albalafiyat.whatsapp.value = b.albalafiyat?.whatsappNumber || '';
+      if (branchEls.albalafiyat.contact) branchEls.albalafiyat.contact.value = b.albalafiyat?.contactNumber || '';
+      if (branchEls.albalafiyat.map) branchEls.albalafiyat.map.value = b.albalafiyat?.mapLink || '';
+      // قيم الثيم
+      const t = settings.theme || {};
+      if (themeEls.textColor) themeEls.textColor.value = t.textColor || '#111827';
+      if (themeEls.bgColor) themeEls.bgColor.value = t.bgColor || '#ffffff';
+      if (themeEls.dividerColor) themeEls.dividerColor.value = t.dividerColor || '#2563EB';
+      if (themeEls.backButtonColor) themeEls.backButtonColor.value = t.backButtonColor || '#374151';
+      if (themeEls.navBgColor) themeEls.navBgColor.value = t.navBgColor || '#0f172a';
+      if (themeEls.textAdBgColor) themeEls.textAdBgColor.value = t.textAdBgColor || '#0b2545';
+      if (themeEls.itemNameColor) themeEls.itemNameColor.value = t.itemNameColor || '#ffffff';
+      if (themeEls.categoryTitleColor) themeEls.categoryTitleColor.value = t.categoryTitleColor || '#2563EB';
+      if (themeEls.itemCardBgColor) themeEls.itemCardBgColor.value = t.itemCardBgColor || '#374151';
+      if (themeEls.itemDescriptionColor) themeEls.itemDescriptionColor.value = t.itemDescriptionColor || '#D1D5DB';
+      if (themeEls.itemPriceColor) themeEls.itemPriceColor.value = t.itemPriceColor || '#93C5FD';
+      if (themeEls.addToCartBgColor) themeEls.addToCartBgColor.value = t.addToCartBgColor || '#2563EB';
+    }
+
+    async function saveSettingsToServer() {
+      const payload = {
+        whatsappNumber: settingsEls.whatsappNumber.value.trim(),
+        contactNumber: settingsEls.contactNumber.value.trim(),
+        locationName: settingsEls.locationName.value.trim(),
+        mapLink: settingsEls.mapLink.value.trim(),
+        googleSheetsWebhookUrl: settingsEls.googleSheetsWebhookUrl?.value?.trim() || '',
+        ordersEnabled: settingsEls.ordersEnabled.checked,
+        theme: {
+          textColor: themeEls.textColor?.value || settings.theme?.textColor || '#111827',
+          bgColor: themeEls.bgColor?.value || settings.theme?.bgColor || '#ffffff',
+          dividerColor: themeEls.dividerColor?.value || settings.theme?.dividerColor || '#2563EB',
+          backButtonColor: themeEls.backButtonColor?.value || settings.theme?.backButtonColor || '#374151',
+          navBgColor: themeEls.navBgColor?.value || settings.theme?.navBgColor || '#0f172a',
+          textAdBgColor: themeEls.textAdBgColor?.value || settings.theme?.textAdBgColor || '#0b2545',
+          itemNameColor: themeEls.itemNameColor?.value || settings.theme?.itemNameColor || '#ffffff',
+          categoryTitleColor: themeEls.categoryTitleColor?.value || settings.theme?.categoryTitleColor || '#2563EB',
+          itemCardBgColor: themeEls.itemCardBgColor?.value || settings.theme?.itemCardBgColor || '#374151',
+          itemDescriptionColor: themeEls.itemDescriptionColor?.value || settings.theme?.itemDescriptionColor || '#D1D5DB',
+          itemPriceColor: themeEls.itemPriceColor?.value || settings.theme?.itemPriceColor || '#93C5FD',
+          addToCartBgColor: themeEls.addToCartBgColor?.value || settings.theme?.addToCartBgColor || '#2563EB'
+        }
+      };
+      // فروع
+      const get = (el) => (el?.value || '').trim();
+      payload.branches = {
+        alsider: {
+          locationName: get(branchEls.alsider.locationName),
+          whatsappNumber: get(branchEls.alsider.whatsapp),
+          contactNumber: get(branchEls.alsider.contact),
+          mapLink: get(branchEls.alsider.map)
+        },
+        alzafranye: {
+          locationName: get(branchEls.alzafranye.locationName),
+          whatsappNumber: get(branchEls.alzafranye.whatsapp),
+          contactNumber: get(branchEls.alzafranye.contact),
+          mapLink: get(branchEls.alzafranye.map)
+        },
+        aldwra: {
+          locationName: get(branchEls.aldwra.locationName),
+          whatsappNumber: get(branchEls.aldwra.whatsapp),
+          contactNumber: get(branchEls.aldwra.contact),
+          mapLink: get(branchEls.aldwra.map)
+        },
+        albalafiyat: {
+          locationName: get(branchEls.albalafiyat.locationName),
+          whatsappNumber: get(branchEls.albalafiyat.whatsapp),
+          contactNumber: get(branchEls.albalafiyat.contact),
+          mapLink: get(branchEls.albalafiyat.map)
+        }
+      };
+      const original = settingsEls.btnSave.textContent;
+      settingsEls.btnSave.textContent = 'جارِ الحفظ...';
+      settingsEls.btnSave.disabled = true;
+      try {
+        const resp = await fetch(SAVE_SETTINGS_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        if (!resp.ok) throw new Error('فشل الحفظ');
+        settings = payload;
+        settingsEls.btnSave.textContent = 'تم الحفظ ✓';
+        setTimeout(() => { settingsEls.btnSave.textContent = original; }, 1500);
+      } catch (e) {
+        settingsEls.btnSave.textContent = 'خطأ في الحفظ';
+        setTimeout(() => { settingsEls.btnSave.textContent = original; }, 2500);
+      } finally {
+        settingsEls.btnSave.disabled = false;
+      }
+    }
+    settingsEls.btnSave.addEventListener('click', saveSettingsToServer);
+    if (themeEls.btnSave) themeEls.btnSave.addEventListener('click', saveSettingsToServer);
+
+    // ===== الإعلانات =====
+    const annEls = {
+      megaEnabled: document.getElementById('megaEnabled'),
+      megaImageUrl: document.getElementById('megaImageUrl'),
+      textEnabled: document.getElementById('textEnabled'),
+      textContent: document.getElementById('textContent'),
+      btnSave: document.getElementById('btnSaveAnnouncements'),
+      btnUploadMegaImage: document.getElementById('btnUploadMegaImage'),
+      megaUploadStatus: document.getElementById('megaUploadStatus'),
+      megaUploadInput: (() => { const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.className='hidden'; document.body.appendChild(i); return i; })()
+    };
+
+    async function loadAnnouncementsData() {
+      try {
+        const resp = await fetch(`${ASSETS_BASE}/announcements.json`, { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          return { ...announcements, ...(data || {}) };
+        }
+      } catch {}
+      return { ...announcements };
+    }
+
+    function applyAnnouncementsToForm() {
+      annEls.megaEnabled.checked = !!announcements.megaEnabled;
+      annEls.megaImageUrl.value = announcements.megaImageUrl || '';
+      annEls.textEnabled.checked = !!announcements.textEnabled;
+      annEls.textContent.value = announcements.textContent || '';
+    }
+
+    async function saveAnnouncementsToServer() {
+      const payload = {
+        megaEnabled: annEls.megaEnabled.checked,
+        megaImageUrl: annEls.megaImageUrl.value.trim(),
+        textEnabled: annEls.textEnabled.checked,
+        textContent: annEls.textContent.value.trim()
+      };
+      const original = annEls.btnSave.textContent;
+      annEls.btnSave.textContent = 'جارِ الحفظ...';
+      annEls.btnSave.disabled = true;
+      try {
+        const resp = await fetch(SAVE_ANNOUNCEMENTS_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        if (!resp.ok) throw new Error('فشل الحفظ');
+        announcements = payload;
+        annEls.btnSave.textContent = 'تم الحفظ ✓';
+        setTimeout(() => { annEls.btnSave.textContent = original; }, 1500);
+      } catch (e) {
+        annEls.btnSave.textContent = 'خطأ في الحفظ';
+        setTimeout(() => { annEls.btnSave.textContent = original; }, 2500);
+      } finally {
+        annEls.btnSave.disabled = false;
+      }
+    }
+    annEls.btnSave.addEventListener('click', saveAnnouncementsToServer);
+
+    // رفع صورة الإعلان الضخم
+    annEls.btnUploadMegaImage.addEventListener('click', () => annEls.megaUploadInput.click());
+    annEls.megaUploadInput.addEventListener('change', async () => {
+      const file = annEls.megaUploadInput.files[0];
+      if (!file) return;
+      const orig = annEls.megaUploadStatus.textContent;
+      annEls.megaUploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const form = new FormData();
+        form.append('image', file);
+        const resp = await fetch(UPLOAD_ENDPOINT, { method: 'POST', body: form });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.path) throw new Error('فشل الرفع');
+        annEls.megaImageUrl.value = json.path;
+        annEls.megaUploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        annEls.megaUploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => annEls.megaUploadStatus.textContent = orig || '', 2000);
+        annEls.megaUploadInput.value = '';
+      }
+    });
+
+    // ===== الهيرو =====
+    let hero = { 
+      enabled: true, autoplay: true, intervalMs: 4000, images: [], 
+      textEnabled: false, textContent: '',
+      buttons: [
+        { enabled: true, iconUrl: 'info.png', href: '' },
+        { enabled: true, iconUrl: 'instagram.png', href: '' }
+      ]
+    };
+
+    const heroEls = {
+      enabled: document.getElementById('heroEnabled'),
+      // تم حذف title: عنصر الهيرو أصبح صورة فقط
+      // تم حذف subtitle: عنصر الهيرو أصبح صورة فقط
+      autoplay: document.getElementById('heroAutoplay'),
+      intervalMs: document.getElementById('heroIntervalMs'),
+      imagesList: document.getElementById('heroImagesList'),
+      imageUrlInput: document.getElementById('heroImageUrlInput'),
+      btnAddImage: document.getElementById('btnAddHeroImage'),
+      btnUploadImage: document.getElementById('btnUploadHeroImage'),
+      uploadStatus: document.getElementById('heroUploadStatus'),
+      btnSave: document.getElementById('btnSaveHero'),
+      textEnabled: document.getElementById('heroTextEnabled'),
+      textContent: document.getElementById('heroTextContent'),
+      uploadInput: (() => { const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.className='hidden'; document.body.appendChild(i); return i; })(),
+      // عناصر أزرار الهيرو
+      btn1Enabled: document.getElementById('heroBtn1Enabled'),
+      btn1IconUrl: document.getElementById('heroBtn1IconUrl'),
+      btn1Href: document.getElementById('heroBtn1Href'),
+      btn1Upload: document.getElementById('btnUploadHeroBtn1Icon'),
+      btn1UploadStatus: document.getElementById('heroBtn1UploadStatus'),
+      btn2Enabled: document.getElementById('heroBtn2Enabled'),
+      btn2IconUrl: document.getElementById('heroBtn2IconUrl'),
+      btn2Href: document.getElementById('heroBtn2Href'),
+      btn2Upload: document.getElementById('btnUploadHeroBtn2Icon'),
+      btn2UploadStatus: document.getElementById('heroBtn2UploadStatus'),
+      uploadIconInput1: (() => { const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.className='hidden'; document.body.appendChild(i); return i; })(),
+      uploadIconInput2: (() => { const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.className='hidden'; document.body.appendChild(i); return i; })()
+    };
+
+    async function loadHeroData() {
+      try {
+        const resp = await fetch(`${ASSETS_BASE}/hero.json`, { cache: 'no-store' });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && typeof data === 'object') return { ...hero, ...data };
+        }
+      } catch {}
+      return { ...hero };
+    }
+
+    function renderHeroImages() {
+      heroEls.imagesList.innerHTML = '';
+      const imgs = Array.isArray(hero.images) ? hero.images : [];
+      if (!imgs.length) {
+        heroEls.imagesList.innerHTML = '<li class="text-gray-500">لا توجد صور بعد.</li>';
+        return;
+      }
+      imgs.forEach((url, idx) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between bg-white rounded-lg border p-2';
+        li.innerHTML = `
+          <div class="flex items-center gap-2">
+            <img src="${url}" alt="hero ${idx+1}" class="w-16 h-10 object-cover rounded border" onerror="this.onerror=null;this.src='https://placehold.co/64x40/cccccc/333?text=IMG'">
+            <span class="text-sm text-gray-700">${url}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button data-action="remove" data-index="${idx}" class="px-3 py-1 rounded-lg bg-red-600 text-white">حذف</button>
+          </div>
+        `;
+        heroEls.imagesList.appendChild(li);
+      });
+    }
+
+    function applyHeroToForm() {
+      heroEls.enabled.checked = !!hero.enabled;
+      heroEls.autoplay.checked = !!hero.autoplay;
+      heroEls.intervalMs.value = hero.intervalMs ?? 4000;
+      if (heroEls.textEnabled) heroEls.textEnabled.checked = !!hero.textEnabled;
+      if (heroEls.textContent) heroEls.textContent.value = hero.textContent || '';
+      const btns = Array.isArray(hero.buttons) ? hero.buttons : [];
+      const b1 = btns[0] || { enabled: false, iconUrl: 'info.png', href: '' };
+      const b2 = btns[1] || { enabled: false, iconUrl: 'instagram.png', href: '' };
+      if (heroEls.btn1Enabled) heroEls.btn1Enabled.checked = !!b1.enabled;
+      if (heroEls.btn1IconUrl) heroEls.btn1IconUrl.value = b1.iconUrl || '';
+      if (heroEls.btn1Href) heroEls.btn1Href.value = b1.href || '';
+      if (heroEls.btn2Enabled) heroEls.btn2Enabled.checked = !!b2.enabled;
+      if (heroEls.btn2IconUrl) heroEls.btn2IconUrl.value = b2.iconUrl || '';
+      if (heroEls.btn2Href) heroEls.btn2Href.value = b2.href || '';
+      renderHeroImages();
+    }
+
+    async function saveHeroToServer() {
+      const payload = {
+        enabled: heroEls.enabled.checked,
+        autoplay: heroEls.autoplay.checked,
+        intervalMs: Number(heroEls.intervalMs.value || hero.intervalMs || 4000),
+        images: (Array.isArray(hero.images) ? hero.images : []).filter(Boolean),
+        textEnabled: !!(heroEls.textEnabled && heroEls.textEnabled.checked),
+        textContent: (heroEls.textContent && heroEls.textContent.value || '').trim(),
+        buttons: [
+          { enabled: !!(heroEls.btn1Enabled && heroEls.btn1Enabled.checked), iconUrl: (heroEls.btn1IconUrl && heroEls.btn1IconUrl.value || '').trim(), href: (heroEls.btn1Href && heroEls.btn1Href.value || '').trim() },
+          { enabled: !!(heroEls.btn2Enabled && heroEls.btn2Enabled.checked), iconUrl: (heroEls.btn2IconUrl && heroEls.btn2IconUrl.value || '').trim(), href: (heroEls.btn2Href && heroEls.btn2Href.value || '').trim() }
+        ]
+      };
+      if (payload.intervalMs > 0 && payload.intervalMs < 50) payload.intervalMs *= 1000;
+      const original = heroEls.btnSave.textContent;
+      heroEls.btnSave.textContent = 'جارِ الحفظ...';
+      heroEls.btnSave.disabled = true;
+      try {
+        const resp = await fetch(SAVE_HERO_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || json.ok === false) throw new Error(json.error || 'فشل الحفظ');
+        hero = payload;
+        heroEls.btnSave.textContent = 'تم الحفظ ✓';
+        setTimeout(() => { heroEls.btnSave.textContent = original; }, 1500);
+      } catch (e) {
+        heroEls.btnSave.textContent = 'خطأ في الحفظ';
+        setTimeout(() => { heroEls.btnSave.textContent = original; }, 2500);
+      } finally {
+        heroEls.btnSave.disabled = false;
+      }
+    }
+
+    // أحداث الهيرو
+    heroEls.btnAddImage.addEventListener('click', () => {
+      const url = (heroEls.imageUrlInput.value || '').trim();
+      if (!url) return;
+      hero.images = Array.isArray(hero.images) ? hero.images : [];
+      hero.images.push(url);
+      heroEls.imageUrlInput.value = '';
+      renderHeroImages();
+    });
+    heroEls.btnUploadImage.addEventListener('click', () => heroEls.uploadInput.click());
+    heroEls.uploadInput.addEventListener('change', async () => {
+      const file = heroEls.uploadInput.files[0];
+      if (!file) return;
+      const orig = heroEls.uploadStatus.textContent;
+      heroEls.uploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, data: dataUrl })
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        hero.images = Array.isArray(hero.images) ? hero.images : [];
+        hero.images.push(json.path);
+        renderHeroImages();
+        heroEls.uploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        heroEls.uploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => heroEls.uploadStatus.textContent = orig || '', 2000);
+        heroEls.uploadInput.value = '';
+      }
+    });
+    heroEls.imagesList.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action="remove"]');
+      if (!btn) return;
+      const i = Number(btn.getAttribute('data-index'));
+      if (Number.isFinite(i)) {
+        hero.images.splice(i, 1);
+        renderHeroImages();
+      }
+    });
+    heroEls.btnSave.addEventListener('click', saveHeroToServer);
+
+    // رفع أيقونات الأزرار
+    heroEls.btn1Upload.addEventListener('click', () => heroEls.uploadIconInput1.click());
+    heroEls.uploadIconInput1.addEventListener('change', async () => {
+      const file = heroEls.uploadIconInput1.files[0];
+      if (!file) return;
+      const orig = heroEls.btn1UploadStatus.textContent;
+      heroEls.btn1UploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, data: dataUrl }) });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        if (heroEls.btn1IconUrl) heroEls.btn1IconUrl.value = json.path;
+        heroEls.btn1UploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        heroEls.btn1UploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => heroEls.btn1UploadStatus.textContent = orig || '', 2000);
+        heroEls.uploadIconInput1.value = '';
+      }
+    });
+    heroEls.btn2Upload.addEventListener('click', () => heroEls.uploadIconInput2.click());
+    heroEls.uploadIconInput2.addEventListener('change', async () => {
+      const file = heroEls.uploadIconInput2.files[0];
+      if (!file) return;
+      const orig = heroEls.btn2UploadStatus.textContent;
+      heroEls.btn2UploadStatus.textContent = 'جارِ الرفع...';
+      try {
+        const dataUrl = await fileToDataURL(file);
+        const resp = await fetch(UPLOAD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, data: dataUrl }) });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json.ok || !json.path) throw new Error(json.error || 'فشل الرفع');
+        if (heroEls.btn2IconUrl) heroEls.btn2IconUrl.value = json.path;
+        heroEls.btn2UploadStatus.textContent = 'تم الرفع ✓';
+      } catch (e) {
+        heroEls.btn2UploadStatus.textContent = 'فشل الرفع';
+      } finally {
+        setTimeout(() => heroEls.btn2UploadStatus.textContent = orig || '', 2000);
+        heroEls.uploadIconInput2.value = '';
+      }
+    });
+
+    // ===== QR =====
+    const menuUrlInput = document.getElementById('menuUrl');
+    const qrContainer = document.getElementById('qrContainer');
+    const btnGenerateQR = document.getElementById('btnGenerateQR');
+    const btnPrintQR = document.getElementById('btnPrintQR');
+
+    function clearQR() { qrContainer.innerHTML = ''; }
+
+    btnGenerateQR.addEventListener('click', async () => {
+      clearQR();
+      const url = (menuUrlInput.value || '').trim() || (location.origin + '/index.html');
+      const canvas = document.createElement('canvas');
+      qrContainer.appendChild(canvas);
+      try {
+        await QRCode.toCanvas(canvas, url, { width: 256 });
+      } catch (e) {
+        qrContainer.innerHTML = '<p class="text-red-600">فشل توليد QR</p>';
+      }
+    });
+
+    btnPrintQR.addEventListener('click', () => {
+      const w = window.open('', '_blank');
+      const url = (menuUrlInput.value || '').trim() || (location.origin + '/index.html');
+      const content = qrContainer.innerHTML || '';
+      w.document.write(`<html><head><title>طباعة QR</title></head><body style="text-align:center; font-family: Cairo, sans-serif;">${content}<p>${url}</p></body></html>`);
+      w.document.close(); w.focus(); w.print(); w.close();
+    });
+
+    // بدء التشغيل الموسع
+    (async () => {
+      // افتراضي: تبويب الأصناف
+      showTab('items');
+      // ضبط قيمة رابط القائمة افتراضياً
+      const defaultMenuUrl = location.origin + '/index.html';
+      if (document.getElementById('menuUrl')) document.getElementById('menuUrl').value = defaultMenuUrl;
+
+      // تحميل البيانات
+      categories = await loadCategoriesData();
+      renderCategories();
+      buildCategoryOptions();
+      // إعادة عرض الأصناف بأسلوب الفئات أولاً
+      renderItems();
+
+      settings = await loadSettingsData();
+      applySettingsToForm();
+
+      announcements = await loadAnnouncementsData();
+      applyAnnouncementsToForm();
+
+      hero = await loadHeroData();
+      applyHeroToForm();
+    })();
+  </script>
+</body>
+</html>
