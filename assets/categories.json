@@ -1,0 +1,47 @@
+[
+  {
+    "name": "كنتاكي ",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1257.jpeg"
+  },
+  {
+    "name": "بيتزا",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1300.jpeg"
+  },
+  {
+    "name": "سندويشات",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1292.jpeg"
+  },
+  {
+    "name": "صاج",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1263.jpeg"
+  },
+  {
+    "name": "فنكر",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1265.jpeg"
+  },
+  {
+    "name": "ريزو",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1298.jpeg"
+  },
+  {
+    "name": "الاضافات",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1267.jpeg"
+  },
+  {
+    "name": "المقبلات",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1290.jpeg"
+  },
+  {
+    "name": "وجبات التوفير",
+    "size": "small",
+    "imageUrl": "assets/images/IMG_1299.jpeg"
+  }
+]

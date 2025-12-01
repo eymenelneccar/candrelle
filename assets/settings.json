@@ -1,0 +1,48 @@
+{
+  "whatsappNumber": "9647767054965",
+  "contactNumber": "9647767054965",
+  "locationName": "فرع حي العامل",
+  "mapLink": "",
+  "googleSheetsWebhookUrl": "",
+  "ordersEnabled": true,
+  "theme": {
+    "textColor": "#111827",
+    "bgColor": "#ffffff",
+    "dividerColor": "#b91c1c",
+    "backButtonColor": "#374151",
+    "navBgColor": "#c42026",
+    "textAdBgColor": "#0b2545",
+    "itemNameColor": "#111827",
+    "categoryTitleColor": "#c42026",
+    "itemCardBgColor": "#ffffff",
+    "itemDescriptionColor": "#6b7280",
+    "itemPriceColor": "#c42026",
+    "addToCartBgColor": "#c42026"
+  },
+  "branches": {
+    "alsider": {
+      "locationName": "فرع الصدر",
+      "whatsappNumber": "",
+      "contactNumber": "",
+      "mapLink": ""
+    },
+    "alzafranye": {
+      "locationName": "فرع الزعفرانية",
+      "whatsappNumber": "",
+      "contactNumber": "",
+      "mapLink": ""
+    },
+    "aldwra": {
+      "locationName": "فرع الدورة",
+      "whatsappNumber": "",
+      "contactNumber": "",
+      "mapLink": ""
+    },
+    "albalafiyat": {
+      "locationName": "فرع البلديات",
+      "whatsappNumber": "",
+      "contactNumber": "",
+      "mapLink": ""
+    }
+  }
+}

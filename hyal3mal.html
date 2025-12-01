@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>مطعم سندريلا | فرع حي العامل</title>
+    <meta property="og:title" content="مطعم سندريلا | فرع حي العامل">
+    <meta name="twitter:title" content="مطعم سندريلا | فرع حي العامل">
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons for aesthetic icons --><script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <script>(function(){var P=['NotSupportedError: The result must not have children','net::ERR_ABORTED'];var oe=console.error;console.error=function(){var m=arguments[0];if(typeof m==='string'&&P.some(function(s){return m.includes(s)}))return;return oe.apply(console,arguments)};window.addEventListener('error',function(e){if(e&&e.message&&P.some(function(s){return e.message.includes(s)})){e.preventDefault();e.stopImmediatePropagation();}},true);})();</script>
+    <script>
+      (function(){
+        try {
+          var p=new URLSearchParams(location.search);var br=(p.get('branch')||'').trim();
+          var names={
+            'hay-alamal':'فرع حي العمال',
+            'adhamiya':'فرع الاعضمية',
+            'ghazaliya':'فرع الغزالية',
+            'bismayah':'فرع بسماية',
+            'dora':'فرع الدورة',
+            'shaab':'فرع الشعب',
+            'hurriya':'فرع الحرية',
+            'banks':'فرع البنوك',
+            'ghadeer':'فرع الغدير'
+          };
+          var nm=names[br];
+          if(nm){ window.settings=Object.assign({}, window.settings||{}, { locationName: nm, branchId: br });
+            try{ document.title='مطعم سندريلا | '+nm; }catch{}
+          }
+        } catch {}
+      })();
+    </script>
+    <script>
+      (function(){
+        try{
+          var br = (window.settings&&window.settings.branchId)||'';
+          var k = br?('menu_governorates_'+br):'';
+          var ek = br?('menu_governorates_enabled_'+br):'';
+          var govs = [];
+          var enabled = true;
+          if (k) {
+            try { var raw = localStorage.getItem(k); if (raw) { var arr = JSON.parse(raw); if (Array.isArray(arr)) govs = arr.filter(Boolean); } } catch {}
+            try { enabled = localStorage.getItem(ek) === '1'; } catch {}
+          }
+          if ((!Array.isArray(govs) || !govs.length) && br) {
+            fetch('assets/governorates.'+br+'.json', { cache:'no-store' }).then(function(resp){ if(!resp.ok) return; return resp.json(); }).then(function(data){ if(Array.isArray(data)&&data.length){ window.settings.governorates = data; } });
+          }
+          window.settings = Object.assign({}, window.settings||{}, { governorates: govs, governoratesEnabled: !!enabled });
+        }catch{}
+      })();
+    </script>
+    <style>
+        /* Custom styles for the dark green theme and product card */
+        :root {
+            --primary-green: #279f60; /* New primary green */
+            --accent-red: #c42026; /* New accent red */
+            --accent-yellow: #fada3e; /* New accent yellow */
+            --light-bg: #f7f7f7; /* Keep light background */
+        }
+
+        .primary-green-bg { background-color: var(--primary-green); }
+        .primary-green-text { color: var(--primary-green); }
+        .accent-red-bg { background-color: var(--accent-red); }
+        .accent-red-text { color: var(--accent-red); }
+        .accent-yellow-bg { background-color: var(--accent-yellow); }
+        .accent-yellow-text { color: var(--accent-yellow); }
+        .bg-light-gray { background-color: var(--light-bg); }
+
+        /* Glassy top navbar over hero */
+        .glass-navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: transparent; /* fully transparent, no red tint */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            z-index: 50;
+            transition: transform 250ms ease, opacity 250ms ease;
+            will-change: transform, opacity; /* hint for Safari */
+        }
+
+        body {
+            font-family: 'Cairo', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--light-bg);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh; /* fallback */
+            min-height: 100svh; /* iOS Safari small viewport */
+            min-height: 100dvh; /* dynamic viewport for modern Safari */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: env(safe-area-inset-bottom); /* iOS notch safe area */
+            padding-top: env(safe-area-inset-top);
+            overscroll-behavior-y: contain; /* reduce bounce where supported */
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        #app-container {
+            width: 100%;
+            max-width: 500px;
+            min-height: 100vh; /* يساوي ارتفاع الشاشة كحد أدنى */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: visible; /* اسمح بتمرير الصفحة العامة */
+        }
+
+        #home-button-ring {
+            position: fixed;
+            bottom: calc(1.25rem + env(safe-area-inset-bottom)); /* ثابت مع safe-area */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4.8rem;
+            height: 4.8rem;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            z-index: 40; /* فوق المحتوى والفوتر */
+        }
+        #home-button {
+            width: 3.6rem;
+            height: 3.6rem;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(196, 32, 38, 0.4);
+            transition: transform 0.2s;
+        }
+        #home-button:active {
+             transform: scale(0.95);
+        }
+
+        /* Floating Action Buttons (FAB) */
+        .fab-wrap { position: fixed; left: 50%; bottom: calc(1.25rem + env(safe-area-inset-bottom)); transform: translateX(-50%); width: 300px; height: 4.8rem; z-index: 45; pointer-events: none; transition: transform 300ms ease; }
+        .fab-wrap.open { transform: translateX(-50%) translateY(-8px); }
+        .fab-main { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3.6rem; height: 3.6rem; border-radius: 9999px; background: var(--accent-red); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 28px rgba(0,0,0,0.24), 18px 10px 28px rgba(0,0,0,0.28), -18px 10px 28px rgba(0,0,0,0.28), 0 0 0 10px #fff; border: none; outline: none; cursor: pointer; pointer-events: auto; }
+        /* Smooth icon swap on FAB main button */
+        .fab-main i, .fab-main svg { transition: opacity 200ms ease, transform 200ms ease; will-change: opacity, transform; }
+        .fab-main.icon-swap i, .fab-main.icon-swap svg { animation: fabIconIn 200ms ease; }
+        /* Logo image inside FAB, forced to white */
+        .fab-main .fab-logo { width: 1.75rem; height: 1.75rem; object-fit: contain; filter: brightness(0) invert(1); transition: opacity 200ms ease, transform 200ms ease; will-change: opacity, transform; }
+        .fab-main.icon-swap .fab-logo { animation: fabIconIn 200ms ease; }
+        @keyframes fabIconIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+        .fab-main:active { transform: translate(-50%, -50%) scale(0.95); }
+        .fab-side { position: absolute; top: 50%; left: 50%; width: 3.2rem; height: 3.2rem; border-radius: 9999px; background: #fff; border: 1px solid var(--accent-red); color: var(--accent-red); display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 14px rgba(0,0,0,0.12); transform: translate(-50%, -50%) scale(0.95); opacity: 0; transition: transform 300ms ease, opacity 300ms ease; will-change: transform, opacity; pointer-events: none; }
+        .fab-wrap.open .fab-side.left { transform: translate(calc(-50% - 130px), -50%) scale(1); opacity: 1; pointer-events: auto; }
+        .fab-wrap.open .fab-side.right { transform: translate(calc(-50% + 130px), -50%) scale(1); opacity: 1; pointer-events: auto; }
+
+        /* Info Button (Left-side Floating) */
+        .info-button-wrap { position: absolute; left: calc(16px + env(safe-area-inset-left)); top: 50%; transform: translateY(-50%); z-index: 110; }
+        @media (max-width: 640px) { .info-button-wrap { left: 12px; } }
+        .info-button { width: 3rem; height: 3rem; border-radius: 9999px; background: transparent; border: none; color: var(--accent-red); display: inline-flex; align-items: center; justify-content: center; box-shadow: none; cursor: pointer; transition: transform 200ms ease; }
+        .info-button:hover { transform: scale(1.05); }
+        .info-button:focus-visible { outline: 2px solid var(--accent-red); outline-offset: 2px; }
+        /* Exact red using mask (preferred) */
+        .info-button .icon-mask { width: 22px; height: 22px; display: inline-block; background-color: var(--accent-red); -webkit-mask-image: url('information.png'); mask-image: url('information.png'); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; -webkit-mask-size: contain; mask-size: contain; }
+        /* Fallback image tinted close to accent red */
+        .info-button img { width: 22px; height: 22px; object-fit: contain; filter: invert(15%) sepia(90%) saturate(5000%) hue-rotate(345deg) brightness(90%) contrast(105%); }
+        .info-button .fallback { display: none; font-weight: 900; font-size: 14px; line-height: 1; }
+        /* Hide the fallback image when mask is supported */
+        @supports (-webkit-mask-image: url("")) { .info-button img { display: none; } }
+        @supports (mask-image: url("")) { .info-button img { display: none; } }
+
+        /* Info Modal Overlay */
+        #info-overlay { position: fixed; inset: 0; background: radial-gradient(1200px 600px at 20% 0%, rgba(196,32,38,0.22), transparent), radial-gradient(1200px 600px at 100% 100%, rgba(250,218,62,0.18), transparent), rgba(0,0,0,0.45); backdrop-filter: saturate(180%) blur(6px); z-index: 70; display: none; align-items: center; justify-content: center; }
+        #info-overlay.show { display: flex; animation: infoFadeIn 240ms ease; }
+        #info-overlay.hide { animation: infoFadeOut 180ms ease; }
+        @keyframes infoFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes infoFadeOut { from { opacity: 1; } to { opacity: 0; } }
+        #info-panel { width: 92%; max-width: 600px; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-radius: 24px; box-shadow: 0 22px 60px rgba(0,0,0,0.25); transform: translateY(16px); opacity: 0; position: relative; overflow: hidden; border: 1px solid rgba(250,218,62,0.35); }
+        #info-panel::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: 24px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6), inset 0 1px 30px rgba(250,218,62,0.15); }
+        #info-overlay.show #info-panel { animation: infoPanelIn 250ms ease forwards; }
+        #info-overlay.hide #info-panel { animation: infoPanelOut 180ms ease forwards; }
+        @keyframes infoPanelIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes infoPanelOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(24px); } }
+        .info-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid rgba(250,218,62,0.35); background: linear-gradient(180deg, rgba(250,218,62,0.08), rgba(255,255,255,0)); }
+        .info-title { font-weight: 900; letter-spacing: 2px; color: var(--accent-red); font-size: 20px; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
+        .info-close { background: #fff; border: 1px solid rgba(250,218,62,0.4); color: #111; padding: 8px; border-radius: 12px; cursor: pointer; transition: background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .info-close:hover { background: #fff8e1; transform: scale(1.05); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+        .info-body { padding: 16px 18px 22px; }
+        /* Allow multi-line default text in About section */
+        #about-text { white-space: pre-line; }
+        .info-section { margin-bottom: 14px; }
+        .info-section h4 { font-size: 16px; font-weight: 900; margin-bottom: 8px; color: #111827; letter-spacing: 1px; }
+        .info-section p, .info-section li { color: #374151; font-size: 14px; line-height: 1.75; }
+        .info-contact-list { list-style: none; padding: 0; margin: 0; }
+        .info-contact-list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        .info-contact-list li:last-child { border-bottom: 0; }
+        .info-contact-list li i { color: var(--accent-red); flex-shrink: 0; }
+        .info-contact-list li a { color: var(--primary-green); font-weight: 800; text-decoration: none; }
+        .info-contact-list li a:hover { text-decoration: underline; }
+
+        /* Product Cup Icon Styling - now dynamically colored */
+        .coffee-cup-visual {
+            background-color: var(--primary-green); /* Default for coffee */
+            border-radius: 12px;
+            position: relative;
+            width: 100%;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-top: 0px;
+            margin-bottom: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease; /* Smooth color change */
+        }
+        .coffee-cup-visual.category-coffee { background-color: var(--primary-green); }
+        .coffee-cup-visual.category-tea { background-color: #6C543A; } /* A warm brown for tea */
+        .coffee-cup-visual.category-cake { background-color: var(--accent-red); } /* Red for cake */
+        .coffee-cup-visual.category-juice { background-color: var(--accent-yellow); } /* Yellow for juice */
+
+        .coffee-cup-visual span {
+            font-size: 0.7rem;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .coffee-cup-visual svg {
+            margin-top: -10px;
+        }
+        
+        /* Interactive Card Hover Effect */
+        .product-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hero section with background image - REDUCED HEIGHT */
+        .hero-section {
+            /* Using the yellow as the base color for safety */
+            background-color: var(--accent-yellow);
+            background-size: cover;
+            background-position: center;
+            padding-bottom: 2.5rem;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            height: 280px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Push content to bottom */
+            transition: height 300ms ease, opacity 300ms ease, padding-bottom 300ms ease;
+        }
+
+        /* Compact mode disabled for hero and navbar: keep natural scroll */
+        #app-container.compact .hero-section { height: 280px; opacity: 1; padding-bottom: 2.5rem; }
+        #app-container.compact .glass-navbar { transform: none; opacity: 1; }
+
+        /* Fixed Glass Navbar at top */
+        .glass-navbar {
+            position: fixed;
+            top: calc(env(safe-area-inset-top) + 0px);
+            left: 0; right: 0;
+            z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-direction: row-reverse;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: saturate(180%) blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            color: #000;
+        }
+        .glass-navbar #navbar-title { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+        .glass-navbar #navbar-sep { margin: 0 4px; }
+        .glass-navbar #navbar-brand, .glass-navbar #navbar-category { letter-spacing: 0; }
+
+        /* Prevent overlap: add top padding to main content under fixed navbar */
+        main { padding-top: calc(56px + env(safe-area-inset-top)); }
+        
+        /* Overlay for better text readability */
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+            z-index: 10;
+        }
+        .hero-video {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 5;
+            display: none;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+        }
+
+        /* The hero-content div is now empty, but we keep the structure for clean HTML */
+        .hero-content {
+            position: relative;
+            z-index: 20;
+            padding: 1rem;
+            color: white;
+            /* Hide the search bar content entirely */
+            display: none; 
+        }
+
+        /* Category tabs styling */
+        /* RTL tabs for Arabic */
+        #category-tabs { 
+            direction: rtl; 
+            overflow-y: hidden; 
+            border-bottom-style: dashed; 
+            border-bottom-width: 2px; 
+            border-bottom-color: var(--accent-red);
+            /* Make category tabs scroll naturally (not sticky) */
+            position: static; 
+            top: auto;
+            z-index: auto; 
+            background: #fff;
+        }
+        #category-tabs button {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        #category-tabs button.active-tab {
+            background-color: var(--accent-red);
+            color: white;
+            box-shadow: 0 2px 8px rgba(196, 32, 38, 0.2);
+        }
+        #category-tabs button:not(.active-tab) {
+            background-color: var(--light-bg);
+            color: var(--accent-red);
+        }
+        #category-tabs button:not(.active-tab) i {
+            color: var(--accent-red);
+        }
+
+        /* Category tab icon: use PNG via CSS mask to inherit color and size */
+        #category-tabs .cat-icon { 
+            width: 24px; height: 24px; display: inline-block; flex-shrink: 0;
+            background-color: currentColor; 
+            -webkit-mask-image: url('fast-food.png'); mask-image: url('fast-food.png');
+            -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            -webkit-mask-position: center; mask-position: center;
+            -webkit-mask-size: contain; mask-size: contain;
+        }
+        #category-tabs .cat-icon-img { width: 24px; height: 24px; object-fit: contain; flex-shrink: 0; }
+        /* Hide fallback image when mask is supported */
+        @supports (-webkit-mask-image: url("")) { #category-tabs .cat-icon-img { display: none; } }
+        @supports (mask-image: url("")) { #category-tabs .cat-icon-img { display: none; } }
+
+        /* Cart Overlay */
+        #cart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 50;
+            display: none;
+        }
+        #cart-panel {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.1);
+            max-height: 92vh; /* fallback */
+            max-height: 92svh; /* iOS Safari */
+            max-height: 92dvh; /* dynamic viewport */
+            display: flex;
+            flex-direction: column;
+        }
+        #cart-body { overflow-y: auto; padding: 1rem; -webkit-overflow-scrolling: touch; }
+        .input { width: 100%; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; font-size: 16px; }
+        .textarea { width: 100%; min-height: 110px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; font-size: 16px; resize: vertical; }
+        .cart-title { font-weight: 900; font-size: 22px; }
+        .cart-subtitle { color: #6b7280; font-size: 13px; }
+        .cart-total { font-weight: 800; font-size: 18px; }
+        .btn { width: 100%; min-height: 46px; padding: 10px 14px; border-radius: 16px; font-weight: 800; cursor: pointer; border: none; font-size: 16px; }
+        .btn-primary { background: var(--primary-green); color: #fff; }
+        .btn-secondary { background: #e5e7eb; color: #111827; }
+
+        /* Item Preview Overlay */
+        #item-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 50; display: none;
+        }
+        #item-panel {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            width: 92%; max-width: 500px; background: #fff; border-radius: 24px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2); max-height: 85vh; max-height: 85svh; max-height: 85dvh; display: flex; flex-direction: column;
+        }
+        #item-body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+        /* Plus circle and quantity badge */
+        .btn-circle { width: 36px; height: 36px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-red); border: 1px solid var(--accent-red); box-shadow: 0 2px 6px rgba(0,0,0,0.08); color: var(--accent-yellow); }
+        .btn-circle i { color: var(--accent-yellow); }
+        .floating-add { position: absolute; right: 10px; bottom: 10px; z-index: 3; }
+        .qty-badge { position: absolute; top: 10px; right: 10px; background: var(--primary-green); color: #fff; font-size: 11px; border-radius: 9999px; padding: 2px 6px; font-weight: 800; display: none; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .qty-badge.show { display: inline-block; }
+        /* Cart count badge on footer cart icon */
+        .cart-count-wrap { position: relative; display: inline-block; }
+        .cart-count-badge { position: absolute; top: -6px; right: -10px; background: #ffffff; color: var(--accent-red); font-size: 10px; border-radius: 9999px; padding: 1px 6px; font-weight: 800; min-width: 16px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.12); display: none; }
+        .cart-count-badge.show { display: inline-block; }
+        .pulse { animation: pulseScale 250ms ease-out; }
+        @keyframes pulseScale { 0% { transform: scale(1);} 50% { transform: scale(1.15);} 100% { transform: scale(1);} }
+
+        /* Pin footer actions to sides and vertically center to match home button */
+        .footer-nav-left, .footer-nav-right { position: absolute; top: 50%; transform: translateY(-50%); }
+        .footer-nav-left { left: calc(50% - 160px); }
+        .footer-nav-right { right: calc(50% - 160px); }
+        /* Fix footer to viewport bottom */
+        .fixed-footer { position: fixed; left: 0; right: 0; bottom: 0; width: 100vw; z-index: 30; }
+        .fixed-footer-stack { position: fixed; left: 0; right: 0; bottom: 0; width: 100vw; z-index: 60; display: flex; flex-direction: column; align-items: stretch; gap: 0; padding-bottom: env(safe-area-inset-bottom); }
+        /* Powered by line under footer (smaller) */
+        .powered-by { text-align: center; font-size: 0.75rem; color: #7a7a7a; padding: 6px 0; line-height: 1.2; background: #ffffff; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; border-top: 1px solid #e5e7eb; padding-bottom: calc(6px + env(safe-area-inset-bottom)); pointer-events: auto; }
+        .powered-by a { color: var(--accent-red); font-weight: 700; text-decoration: none; font-size: inherit; }
+        /* Ensure tab labels align to the right for Arabic */
+        #category-tabs button { text-align: right; }
+
+    </style>
+</head>
+<body class="bg-light-gray">
+
+<!-- Toast Notification Container for modern feedback --><div id="toast-container" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none w-full max-w-xs">
+    <!-- Toasts will be dynamically added here --></div>
+
+<div id="app-container">
+    <!-- Hero Section with Background Image --><header class="hero-section">
+        <div class="hero-overlay"></div>
+        <video id="hero-video" class="hero-video" muted playsinline preload="auto" autoplay>
+            <source id="hero-video-source" />
+        </video>
+        <!-- Hero Textbar (from dashboard hero settings) -->
+        <div id="hero-textbar" class="absolute top-2 left-1/2 -translate-x-1/2 z-20 px-3 py-2 rounded-xl text-xs font-bold text-white shadow-md" style="display:none;"></div>
+
+        <!-- Glass Navbar over Hero -->
+        <div class="glass-navbar">
+            <div id="navbar-title" class="flex items-center gap-0">
+                <span id="navbar-brand" class="font-black tracking-widest">مطعم سندريلا</span><span id="navbar-sep" class="text-gray-500" style="display:none;">|</span><span id="navbar-category" class="font-extrabold tracking-widest" style="display:none;"></span>
+            </div>
+            <!-- Info Button inside fixed Glass Navbar -->
+            <div id="info-button-wrap" class="info-button-wrap" aria-live="polite">
+                <button id="info-button" class="info-button" onclick="window.openInfo()" aria-label="حول المطعم" title="حول المطعم">
+                    <span class="icon-mask" aria-hidden="true"></span>
+                    <img src="information.png" alt="معلومات" onerror="handleInfoIconError(this)" />
+                    <span class="fallback" aria-hidden="true">i</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hero Content (Now empty, keeping structure for possible future use) --><div class="hero-content">
+            <!-- Search bar content has been removed from here -->
+        </div>
+    </header>
+
+    <!-- Announcements from dashboard (scrolls with content) -->
+    <div id="announcement-text" class="px-4 py-2 text-white text-center font-bold" style="display:none;"></div>
+    <div id="mega-announcement-wrap" class="p-4" style="display:none;">
+        <img id="mega-announcement-img" src="" alt="Announcement" class="w-full rounded-2xl border" onerror="this.style.display='none'" />
+    </div>
+    <!-- Main Content Area --><main class="flex-grow bg-white px-4 pb-40 pt-0" style="padding-bottom: calc(10rem + env(safe-area-inset-bottom));">
+        <!-- Category Tabs inside scroll container for correct sticky behavior -->
+        <nav id="category-tabs" dir="rtl" class="flex justify-start items-center gap-4 p-4 overflow-x-auto whitespace-nowrap bg-white sticky top-0 z-10 border-b border-gray-100"></nav>
+        <!-- Active Category Title --><h3 id="category-title" dir="rtl" class="text-right text-2xl sm:text-3xl font-black text-gray-900 mb-4 tracking-widest">الكل</h3>
+        
+        <!-- Product Grid - Gap increased to 8 --><div id="product-grid" class="grid grid-cols-2 gap-8 pb-36">
+            <!-- Products will be rendered here by JavaScript --></div>
+    </main>
+
+    <!-- Floating Action Buttons: main + two sides -->
+    <div id="fab-wrap" class="fab-wrap" aria-live="polite">
+        <button id="fab-main" class="fab-main" onclick="toggleFab()" aria-expanded="false" aria-controls="fab-left fab-right" aria-label="الزر الرئيسي">
+            <span id="fab-icon"><img src="app.png" alt="logo" class="fab-logo" /></span>
+            <span id="cart-count-badge" class="cart-count-badge"></span>
+        </button>
+        <button id="fab-left" class="fab-side left" onclick="openMap()" aria-label="الموقع">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
+        </button>
+        <button id="fab-right" class="fab-side right" onclick="openCart()" aria-label="السلة">
+            <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- Info Button moved into Glass Navbar above -->
+
+    <!-- Info Modal -->
+    <div id="info-overlay" role="dialog" aria-modal="true" aria-labelledby="info-title" aria-describedby="info-desc" onclick="window.closeInfo(event)" style="display:none;">
+        <div id="info-panel" class="mx-auto" onclick="event.stopPropagation()" tabindex="-1">
+            <div class="info-header">
+                <div class="info-title" id="info-title">حول المطعم</div>
+                <button class="info-close" onclick="window.closeInfo()" aria-label="إغلاق">
+                    <span style="font-weight:900;">×</span>
+                </button>
+            </div>
+            <div class="info-body" id="info-desc">
+                <div class="info-section">
+                    <h4>حول المطعم</h4>
+                    <p id="about-text">—</p>
+                </div>
+                <div class="info-section">
+                    <h4>معلومات الاتصال</h4>
+                    <ul class="info-contact-list">
+                        <li><i data-lucide="phone" class="w-5 h-5"></i><strong>الهاتف:</strong> <span id="contact-number">—</span></li>
+                        <li><i data-lucide="message-circle" class="w-5 h-5"></i><strong>واتساب:</strong> <span id="whatsapp-number">—</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fixed Powered By at Footer -->
+    <div class="powered-by">تم صنعها بواسطة | <a href="https://iqrarabic.com/" target="_blank" rel="noopener">İQR MENU</a></div>
+    
+    </div>
+
+<!-- Cart Overlay -->
+<div id="cart-overlay" onclick="closeCart(event)">
+  <div id="cart-panel" class="mx-auto max-w-[500px]" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <button onclick="closeCart()" class="p-2 rounded-xl hover:bg-gray-100 active:scale-95" aria-label="Close">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="text-center flex-1">
+        <div class="cart-title">اطلع على سلتك</div>
+        <div id="cart-branch-subtitle" class="cart-subtitle">انت تطلب من فرع حي العامل</div>
+      </div>
+      <div style="width:40px"></div>
+    </div>
+
+    <!-- Body -->
+    <div id="cart-body">
+      <div id="empty-cart" class="text-center py-8">
+        <i data-lucide="shopping-cart" class="w-10 h-10 primary-green-text mx-auto"></i>
+        <p class="mt-2 font-bold">عربتك فارغة حالياً</p>
+        <p class="cart-subtitle">أضف بعض الأطباق الشهية</p>
+      </div>
+
+      <div id="cart-items" class="space-y-3 hidden"></div>
+
+      <div class="mt-4">
+        <label class="block mb-2 font-bold">ملاحظة الزبون</label>
+        <textarea id="cart-note" class="textarea" placeholder="اكتب أي ملاحظة للطلب هنا..."></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <div>
+          <label class="block mb-2 font-bold">الاسم</label>
+          <input id="cust-name" class="input" placeholder="اكتب اسمك" />
+        </div>
+        <div>
+          <label class="block mb-2 font-bold">الرقم</label>
+          <input id="cust-phone" class="input" placeholder="اكتب رقم هاتفك" inputmode="tel" />
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <label class="block mb-2 font-bold">العنوان</label>
+        <input id="cust-address" class="input" placeholder="اكتب عنوانك بالتفصيل" />
+        <p class="cart-subtitle mt-1">مثال: الشارع/البيت/الطابق/أقرب نقطة دالة</p>
+      </div>
+
+      <div class="mt-4">
+        <label class="block mb-2 font-bold">المحافظة/المنطقة</label>
+        <select id="cust-governorate" class="input"></select>
+        <p class="cart-subtitle mt-1">اختر منطقتك لحساب أجور التوصيل</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t bg-white">
+      <div id="delivery-fee-row" class="flex justify-between items-center mb-2">
+        <span class="font-bold">أجور التوصيل:</span>
+        <span id="delivery-fee" class="cart-total">0 د.ع</span>
+      </div>
+      <div class="flex justify-between items-center mb-3">
+        <span class="font-bold">الإجمالي:</span>
+        <span id="cart-total" class="cart-total">0 د.ع</span>
+      </div>
+      <button class="btn btn-primary mb-2" onclick="sendOrder()">إرسال الطلب</button>
+      <button class="btn btn-secondary" onclick="callOrder()">
+        <span class="inline-flex items-center gap-2"><i data-lucide="phone" class="w-5 h-5"></i> اطلب عبر اتصال</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Item Preview Overlay -->
+<div id="item-overlay" onclick="closeItemPreview(event)">
+  <div id="item-panel" class="mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <button onclick="closeItemPreview()" class="p-2 rounded-xl hover:bg-gray-100 active:scale-95" aria-label="Close">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="text-center flex-1">
+        <div id="preview-name" class="font-black text-lg"></div>
+        <div id="preview-category" class="cart-subtitle"></div>
+      </div>
+      <div style="width:40px"></div>
+    </div>
+
+    <!-- Body -->
+    <div id="item-body" class="p-4">
+      <img id="preview-image" src="" alt="preview" class="w-full h-44 object-cover rounded-2xl border mb-3" onerror="this.style.display='none'" />
+      <div id="preview-desc" class="text-gray-600 text-sm"></div>
+      <div class="mt-3 font-bold">السعر: <span id="preview-price"></span></div>
+      <div id="preview-variants" class="mt-3 space-y-2"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t bg-white">
+      <button id="preview-add-btn" class="btn btn-primary w-full" onclick="addToCart(window.previewItemId)">+ أضف إلى السلة</button>
+    </div>
+  </div>
+</div>
+
+<script>
+    // --- Dynamic Data from assets ---
+    let items = [];
+    let categories = [];
+    let activeCategory = '';
+    let governorates = [];
+    let selectedGovName = '';
+    let selectedGovFee = 0;
+
+    function nc(u){ try{ const s=String(u||''); const sep = s.includes('?') ? '&' : '?'; return s + sep + 't=' + Date.now(); } catch { return u; } }
+
+    async function loadMenuItems() {
+        try {
+            const resp = await fetch(nc('assets/menu.json'), { cache: 'no-store' });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (Array.isArray(data)) {
+                    items = data.map(it => ({
+                        id: it.id,
+                        name: it.name,
+                        category: (it.category||'').trim(),
+                        price: Number(it.price)||0,
+                        description: it.description||'',
+                        imageUrl: it.imageUrl||'',
+                        variants: Array.isArray(it.variants) ? it.variants.map(v => ({ name: String(v.name||'').trim(), price: Number(v.price)||0 })) : undefined
+                    }));
+                }
+            }
+        } catch (e) {
+            console.warn('تعذر تحميل العناصر من assets/menu.json', e);
+        }
+    }
+
+    async function loadCategories() {
+        try {
+            const resp = await fetch(nc('assets/categories.json'), { cache: 'no-store' });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (Array.isArray(data)) {
+                    categories = data.map(c => typeof c === 'string' ? c : (c && c.name) || '').filter(Boolean);
+                }
+            }
+        } catch (e) {
+            console.warn('تعذر تحميل الفئات من assets/categories.json', e);
+        }
+        // اشتق الفئات عند الحاجة من العناصر
+        if (!categories.length && Array.isArray(items)) {
+            const set = new Set(items.map(i => (i.category || '').trim()).filter(Boolean));
+            categories = Array.from(set);
+        }
+    }
+
+    async function loadGovernorates() {
+        try {
+            const br = (window.settings && window.settings.branchId) || '';
+            governorates = [];
+            let hadLocal = false;
+            let hadBranchFile = false;
+            if (br) {
+                try {
+                    const raw = localStorage.getItem('menu_governorates_' + br);
+                    if (raw != null) { // حتى لو كانت [] اعتبرها محددة محلياً
+                        hadLocal = true;
+                        const arr = JSON.parse(raw);
+                        if (Array.isArray(arr)) {
+                            governorates = arr.map(g => ({ name: (g.name||'').trim(), fee: Number(g.fee)||0 })).filter(g => typeof g.name === 'string');
+                        }
+                    }
+                } catch {}
+                if (!hadLocal) {
+                    try {
+                        const respB = await fetch(nc('assets/governorates.' + br + '.json'), { cache: 'no-store' });
+                        if (respB.ok) {
+                            hadBranchFile = true;
+                            const dataB = await respB.json();
+                            if (Array.isArray(dataB)) {
+                                governorates = dataB.map(g => ({ name: (g.name||'').trim(), fee: Number(g.fee)||0 })).filter(g => typeof g.name === 'string');
+                            }
+                        }
+                    } catch {}
+                }
+            }
+            // لا تسقط إلى الملف العام إذا كان هناك تحديد فرعي محلي أو ملف فرعي حتى لو فارغ
+            if ((!Array.isArray(governorates) || !governorates.length) && !br) {
+                try {
+                    const resp = await fetch(nc('assets/governorates.json'), { cache: 'no-store' });
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        if (Array.isArray(data)) {
+                            governorates = data.map(g => ({ name: (g.name||'').trim(), fee: Number(g.fee)||0 })).filter(g => g.name);
+                        }
+                    }
+                } catch {}
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    // استخدم صورة المنتج بدل أيقونة الكأس
+
+    /**
+     * Shows a modern, non-blocking toast notification.
+     * Replaces old alert() calls.
+     * @param {string} message - The message to display.
+     */
+    function showToast(message) {
+        // Translate common English actions to Arabic for better user experience
+        let translatedMessage = message;
+        if (message.includes('Added')) {
+            translatedMessage = message.replace('Added', 'تمت إضافة');
+            translatedMessage = translatedMessage.replace('to cart', 'إلى السلة');
+        } else if (message.includes('View Opened')) {
+            translatedMessage = 'تم فتح صفحة ' + message.replace(' View Opened', '');
+        } else if (message.includes('Opened')) {
+             translatedMessage = 'تم فتح القائمة';
+        } else if (message.includes('Filter Opened')) {
+             translatedMessage = 'تم فتح الفلاتر';
+        } else if (message.includes('Search Opened')) {
+             translatedMessage = 'تم فتح البحث';
+        }
+
+
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        
+        toast.className = 'bg-gray-800 text-white text-center px-4 py-3 rounded-xl shadow-2xl opacity-0 transition-all duration-300 ease-out transform translate-y-2 max-w-full';
+        toast.textContent = translatedMessage;
+
+        toastContainer.appendChild(toast);
+
+        // Show toast
+        setTimeout(() => {
+            toast.classList.remove('opacity-0', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+        }, 10);
+
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', 'translate-y-2');
+            // Remove from DOM after transition
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+    window.alert = (msg) => showToast(msg); // Override alert() for safety, though we use showToast directly now.
+
+    // --- Dashboard linkage: settings, theme, announcements, hero ---
+    let settings = { theme: {} };
+    let announcements = {};
+    let hero = {};
+    let heroTimer = null;
+    let heroVideoResumeTimer = null;
+    window.currentTheme = {};
+    window.GS_ORDER_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwGGS5v1__sUjc4hdbKb4YhF8CTHHh5qk3kjYrqlhNq3S8ySCxrbp3D0bdHCx6BbMIwlg/exec';
+
+    async function loadSettings() {
+        try {
+            const resp = await fetch(nc('assets/settings.json'), { cache: 'no-store' });
+            if (resp.ok) {
+                settings = await resp.json();
+            }
+        } catch (e) { /* ignore */ }
+        applyTheme(settings.theme || {});
+        updateNavbarTitleOnScroll();
+        updateCartBranchSubtitle();
+    }
+
+    function applyTheme(t) {
+        window.currentTheme = t || {};
+        if (t.bgColor) document.body.style.backgroundColor = t.bgColor;
+        if (t.textColor) document.body.style.color = t.textColor;
+        const footer = document.querySelector('footer');
+        // لا تلوّن خلفية الفوتر من الإعدادات؛ اترك CSS يتحكم
+        if (footer) footer.style.backgroundColor = '';
+        const tabs = document.getElementById('category-tabs');
+        if (tabs && t.dividerColor) tabs.style.borderBottomColor = t.dividerColor;
+        const title = document.getElementById('category-title');
+        if (title && t.categoryTitleColor) title.style.color = t.categoryTitleColor;
+    }
+
+    async function loadAnnouncements() {
+        try {
+            const resp = await fetch(nc('assets/announcements.json'), { cache: 'no-store' });
+            if (resp.ok) announcements = await resp.json();
+        } catch (e) { /* ignore */ }
+        applyAnnouncements();
+    }
+
+    function applyAnnouncements() {
+        const textBar = document.getElementById('announcement-text');
+        const megaWrap = document.getElementById('mega-announcement-wrap');
+        const megaImg = document.getElementById('mega-announcement-img');
+        const t = settings.theme || {};
+        if (textBar) {
+            if (announcements && announcements.textEnabled && announcements.textContent) {
+                textBar.textContent = announcements.textContent;
+                textBar.style.display = 'block';
+                if (t.textAdBgColor) textBar.style.backgroundColor = t.textAdBgColor;
+            } else {
+                textBar.style.display = 'none';
+            }
+        }
+        if (megaWrap && megaImg) {
+            if (announcements && announcements.megaEnabled && announcements.megaImageUrl) {
+                megaImg.src = announcements.megaImageUrl;
+                megaWrap.style.display = 'block';
+                megaImg.style.display = '';
+            } else {
+                megaWrap.style.display = 'none';
+            }
+        }
+    }
+
+    async function loadHero() {
+        try {
+            const resp = await fetch(nc('assets/hero.json'), { cache: 'no-store' });
+            if (resp.ok) hero = await resp.json();
+        } catch (e) { /* ignore */ }
+        applyHero();
+    }
+
+    function applyHero() {
+        const headerEl = document.querySelector('.hero-section');
+        if (!headerEl) return;
+        const videoEl = document.getElementById('hero-video');
+        if (heroVideoResumeTimer) { try { clearTimeout(heroVideoResumeTimer); } catch {}; heroVideoResumeTimer = null; }
+        const imgs = Array.isArray(hero.images) ? hero.images.filter(Boolean) : [];
+        const oneImg = String(hero.imageUrl||'').trim();
+        let idx = 0;
+        function setBg(url) {
+            if (url) headerEl.style.backgroundImage = `url('${url}')`;
+        }
+        const vid = (String(hero.mediaType||'').toLowerCase()==='video' ? String(hero.videoUrl||'').trim() : '');
+        if (vid && videoEl) {
+            const sourceEl = document.getElementById('hero-video-source');
+            const ext = vid.split('.').pop().toLowerCase();
+            const typeMap = { mp4: 'video/mp4', webm: 'video/webm', ogv: 'video/ogg', ogg: 'video/ogg' };
+            if (sourceEl) {
+                sourceEl.src = nc(vid);
+                sourceEl.type = typeMap[ext] || '';
+            } else {
+                videoEl.src = nc(vid);
+            }
+            videoEl.style.display = 'block';
+            headerEl.style.backgroundImage = '';
+            try { videoEl.load(); } catch {}
+            const tryPlay = () => { try { videoEl.play().catch(()=>{}); } catch {} };
+            videoEl.addEventListener('canplay', tryPlay, { once: true });
+            setTimeout(tryPlay, 100);
+            try { videoEl.loop = true; videoEl.setAttribute('loop',''); } catch {}
+            try { videoEl.onended = null; } catch {}
+            videoEl.onerror = () => {
+                videoEl.pause();
+                videoEl.style.display = 'none';
+                videoEl.removeAttribute('src');
+                if (sourceEl) { sourceEl.removeAttribute('src'); sourceEl.removeAttribute('type'); }
+                try { videoEl.removeAttribute('preload'); videoEl.removeAttribute('autoplay'); } catch {}
+                if (heroVideoResumeTimer) { try { clearTimeout(heroVideoResumeTimer); } catch {}; heroVideoResumeTimer = null; }
+                if (imgs.length) setBg(imgs[0]); else if (oneImg) setBg(oneImg);
+            };
+        } else {
+            if (videoEl) {
+                try { videoEl.pause(); } catch {}
+                videoEl.style.display = 'none';
+                videoEl.removeAttribute('src');
+                try { videoEl.removeAttribute('preload'); videoEl.removeAttribute('autoplay'); } catch {}
+                try { videoEl.onended = null; } catch {}
+                if (heroVideoResumeTimer) { try { clearTimeout(heroVideoResumeTimer); } catch {}; heroVideoResumeTimer = null; }
+            }
+            if (imgs.length) setBg(imgs[0]); else if (oneImg) setBg(oneImg);
+            if (hero.autoplay && imgs.length > 1) {
+                clearInterval(heroTimer);
+                const iv = Number(hero.intervalMs || 4000);
+                heroTimer = setInterval(() => {
+                    idx = (idx + 1) % imgs.length;
+                    setBg(imgs[idx]);
+                }, iv);
+            }
+        }
+        const textbar = document.getElementById('hero-textbar');
+        const t = settings.theme || {};
+        if (textbar) {
+            if (hero.textEnabled && hero.textContent) {
+                textbar.textContent = hero.textContent;
+                textbar.style.display = 'block';
+                if (t.textAdBgColor) textbar.style.backgroundColor = t.textAdBgColor;
+            } else {
+                textbar.style.display = 'none';
+            }
+        }
+    }
+
+    window.openMap = () => {
+        const url = (settings && settings.mapLink) || '';
+        if (url) { window.open(url, '_blank'); } else { showToast('رابط الخريطة غير متوفر'); }
+    };
+
+    function toEnglishDigits(str) {
+        const arNums = '٠١٢٣٤٥٦٧٨٩';
+        return String(str||'').replace(/[٠-٩]/g, d => String(arNums.indexOf(d)));
+    }
+    function sanitizePhone(n) {
+        n = toEnglishDigits(n || '').replace(/[^0-9+]/g, '');
+        n = n.replace(/^0+/, '');
+        n = n.replace(/^\+/, '');
+        return n;
+    }
+
+
+    /**
+     * Creates the HTML string for a single product card.
+     * @param {Object} product - The product data.
+     * @returns {string} HTML string.
+     */
+    function createProductCard(product) {
+        const priceText = (Number.isFinite(Number(product.price)) && Number(product.price) > 0)
+            ? `${Number(product.price).toLocaleString('ar-IQ')} د.ع`
+            : '';
+        // Quantity badge removed per request; we keep UI clean without counters
+        const t = window.currentTheme || {};
+        const cardStyle = t.itemCardBgColor ? `background:${t.itemCardBgColor};` : '';
+        const nameStyle = t.itemNameColor ? `color:${t.itemNameColor};` : '';
+        const descStyle = t.itemDescriptionColor ? `color:${t.itemDescriptionColor};` : '';
+        const priceStyle = t.itemPriceColor ? `color:${t.itemPriceColor};` : '';
+        const addBtnStyle = t.addToCartBgColor ? `background:${t.addToCartBgColor};border-color:${t.addToCartBgColor};` : '';
+        const variants = Array.isArray(product.variants) ? product.variants : [];
+        const variantsHtml = variants.length ? `
+            <div class="mt-2 space-y-2">
+                ${variants.map((v, idx) => `
+                    <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-2">
+                        <div class="flex flex-col items-start leading-tight">
+                            <span class="font-extrabold text-base" style="${priceStyle}">${Number(v.price||0).toLocaleString('ar-IQ')} د.ع</span>
+                            <span class="text-xs text-gray-700 mt-1">${v.name}</span>
+                        </div>
+                        <button class="px-2 py-1 rounded-lg text-white text-sm active:scale-95" style="${addBtnStyle}" onclick="addVariantToCart(${product.id}, ${idx}, this); event.stopPropagation();">+</button>
+                    </div>
+                `).join('')}
+            </div>
+        ` : '';
+        return `
+            <div class="product-card bg-white rounded-3xl p-3 shadow-md border border-gray-100 relative" onclick="openItemPreview(${product.id})" style="${cardStyle}">
+                <div class="relative">
+                    <img src="${product.imageUrl || ''}" alt="${product.name}" class="w-full h-36 object-cover rounded-xl border mb-2" onerror="this.style.display='none'" style="${product.imageUrl ? '' : 'display:none;'}" />
+                </div>
+                <div class="p-2 pt-0">
+                    <p class="text-gray-800 font-semibold text-sm truncate" style="${nameStyle}">${product.name}</p>
+                    <p class="text-gray-400 text-xs mt-1" style="${descStyle}">${product.description || ''}</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="accent-red-text font-extrabold text-lg" style="${priceStyle}">${priceText}</span>
+                    </div>
+                    ${variantsHtml}
+                </div>
+                ${(!variants.length && priceText) ? `
+                    <button class="btn-circle floating-add active:scale-95" style="${addBtnStyle}" onclick="addToCart(${product.id}, this); event.stopPropagation();" aria-label="Add to cart">
+                        <i data-lucide="plus" class="w-6 h-6"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    /**
+     * Renders products for the active category.
+     */
+    function renderProducts() {
+        const productGrid = document.getElementById('product-grid');
+        const categoryTitle = document.getElementById('category-title');
+        categoryTitle.textContent = activeCategory || 'الكل';
+        const __norm = s => String(s||'').trim();
+        const filteredProducts = (activeCategory ? items.filter(p => __norm(p.category) === __norm(activeCategory)) : items.slice())
+            .filter(p => (p.type || 'item') !== 'heading');
+
+        productGrid.style.opacity = 0;
+        setTimeout(() => {
+            if (!filteredProducts.length) {
+                productGrid.innerHTML = `<p class="col-span-2 text-center text-gray-500 py-10">لا توجد عناصر ضمن «${activeCategory || 'الكل'}» حالياً</p>`;
+            } else {
+                productGrid.innerHTML = filteredProducts.map(createProductCard).join('');
+            }
+            productGrid.style.opacity = 1;
+            try { lucide.createIcons(); } catch {}
+        }, 200);
+    }
+
+    function renderGovernorateSelect() {
+        const sel = document.getElementById('cust-governorate');
+        if (!sel) return;
+        const opts = ['<option value="">— اختر منطقتك —</option>', ...governorates.map(g => `<option value="${g.name}">${g.name} — ${formatIQD(g.fee)}</option>`)];
+        sel.innerHTML = opts.join('');
+        if (selectedGovName) sel.value = selectedGovName;
+    }
+
+    /**
+     * Creates the HTML for category tabs.
+     */
+    function renderCategoryTabs() {
+        const tabsContainer = document.getElementById('category-tabs');
+        const cats = Array.isArray(categories) ? categories : [];
+        const __norm = s => String(s||'').trim();
+        tabsContainer.innerHTML = cats.map(catName => {
+            const isActive = __norm(catName) === __norm(activeCategory);
+            const classes = isActive ? 'active-tab' : '';
+            return `
+                <button onclick="setActiveCategory('${catName}')" 
+                    class="flex items-center gap-2 py-3 px-5 rounded-2xl font-bold text-base transition duration-200 min-w-max active:scale-95 ${classes}">
+                    <span class="cat-icon" aria-hidden="true"></span>
+                    <img class="cat-icon-img" src="fast-food.png" alt="" />
+                    <span>${catName}</span>
+                </button>
+            `;
+        }).join('');
+        try { lucide.createIcons(); } catch {}
+    }
+
+    /**
+     * Shows or hides the category part in the navbar.
+     * When cat is empty, only the brand is shown.
+     */
+    function setNavbarCategory(cat) {
+        try {
+            const sepEl = document.getElementById('navbar-sep');
+            const catEl = document.getElementById('navbar-category');
+            if (!sepEl || !catEl) return;
+            const txt = (cat || '').trim();
+            if (txt) {
+                sepEl.style.display = '';
+                catEl.textContent = txt;
+                catEl.style.display = '';
+            } else {
+                sepEl.style.display = 'none';
+                catEl.textContent = '';
+                catEl.style.display = 'none';
+            }
+        } catch {}
+    }
+
+    function getBranchName() {
+        try {
+            const s = window.settings || {};
+            const n = (s.locationName || '').trim();
+            if (n) return n;
+            const b = s.branches || {};
+            const pref = (b.alzafranye?.locationName || b.alsider?.locationName || b.aldwra?.locationName || b.albalafiyat?.locationName || '').trim();
+            return pref || 'فرع حي العامل';
+        } catch { return 'فرع حي العامل'; }
+    }
+    function updateNavbarTitleOnScroll() {
+        try {
+            setNavbarCategory(getBranchName());
+        } catch {}
+    }
+
+    function updateCartBranchSubtitle() {
+        try {
+            const el = document.getElementById('cart-branch-subtitle');
+            if (el) el.textContent = `انت تطلب من ${getBranchName()}`;
+        } catch {}
+    }
+
+    /**
+     * Sets the active category and re-renders the content.
+     * @param {string} categoryName - The name of the category to set as active.
+     */
+    window.setActiveCategory = (categoryName) => {
+        const __norm = s => String(s||'').trim();
+        const next = __norm(categoryName);
+        if (__norm(activeCategory) !== next) {
+            activeCategory = next;
+            renderCategoryTabs();
+            renderProducts();
+            updateNavbarTitleOnScroll();
+        }
+    };
+    
+    window.goHome = () => {
+        const first = Array.isArray(categories) && categories.length ? categories[0] : '';
+        setActiveCategory(first);
+    };
+    window.scrollToHero = () => {
+        try {
+            const main = document.querySelector('main');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        } catch {}
+        const heroEl = document.querySelector('.hero-section');
+        if (heroEl && heroEl.scrollIntoView) {
+            heroEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
+    // --- Scroll Hide/Show for Hero and Top Navbar ---
+    (function setupScrollHide() {
+        const app = document.getElementById('app-container');
+        const main = document.querySelector('main');
+        if (!app || !main) return;
+
+        let last = 0;
+        let ticking = false;
+        let compact = false;
+        // مهلة زمنية لتجنب التبديل السريع عند السحب السريع
+        let lastToggleAt = 0;
+        const minToggleInterval = 200; // ms
+
+        // عتبات: الإخفاء بعد النزول، والإظهار فقط عند القمة
+        const hideStart = 2;    // يبدأ الإخفاء بعد 2px نزولًا
+        const showStart = 2;    // يظهر فقط عند الوصول إلى أعلى الصفحة
+        
+        // يمنع الإخفاء عندما يكون المحتوى قصيرًا (لا تمرير حقيقي)
+        const canCompact = () => {
+            try {
+                const doc = document.documentElement;
+                return (doc.scrollHeight - window.innerHeight) > 120;
+            } catch { return false; }
+        };
+        
+        function update() {
+            const st = window.scrollY || document.documentElement.scrollTop || 0;
+        
+            // إذا لا يوجد تمرير كافٍ، أبقِ الواجهة غير مضغوطة
+            if (!canCompact()) {
+                if (compact) { app.classList.remove('compact'); compact = false; }
+                last = st;
+                ticking = false;
+                return;
+            }
+        
+            const goingDown = st > last;
+        
+            const now = (window.performance && performance.now) ? performance.now() : Date.now();
+            const sinceLastToggle = now - lastToggleAt;
+            // لا تُظهر عند تمرير للأعلى بشكل جزئي؛ الإظهار فقط عند القمة
+            if (st > hideStart) {
+                if (!compact && sinceLastToggle > minToggleInterval) {
+                    app.classList.add('compact'); compact = true; lastToggleAt = now;
+                }
+            } else if (st <= showStart) {
+                if (compact && sinceLastToggle > minToggleInterval) {
+                    app.classList.remove('compact'); compact = false; lastToggleAt = now;
+                }
+            }
+        
+            last = st;
+            ticking = false;
+        }
+    
+        function onScroll() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(update);
+        }
+    
+        window.addEventListener('scroll', onScroll, { passive: true });
+        // عند تغيير حجم الشاشة، إن صار المحتوى قصيرًا أعِد التوسيع
+        window.addEventListener('resize', () => {
+            if (!canCompact()) {
+                app.classList.remove('compact');
+                compact = false;
+            }
+        });
+    })();
+    
+    // --- Actions ---
+    window.addToCart = (productId, el) => {
+        const product = items.find(p => p.id === productId);
+        if (!product) return;
+        const idx = cart.findIndex(c => c.id === productId);
+        if (idx >= 0) {
+            cart[idx].qty += 1;
+        } else {
+            cart.push({ id: product.id, name: product.name, price: Number(product.price)||0, qty: 1, imageUrl: product.imageUrl || '' });
+        }
+        renderCart();
+        if (el) {
+            try {
+                const original = el.innerHTML;
+                el.innerHTML = '<i data-lucide="check" class="w-6 h-6"></i>';
+                try { lucide.createIcons(); } catch {}
+                setTimeout(() => { el.innerHTML = original; }, 1000);
+            } catch {}
+        }
+    };
+
+    window.addVariantToCart = (baseId, idx, el) => {
+        const base = items.find(p => p.id === baseId);
+        if (!base) return;
+        const vars = Array.isArray(base.variants) ? base.variants : [];
+        const v = vars[idx];
+        if (!v) return;
+        const price = Number(v.price)||0;
+        const name = v.name ? `${base.name} (${String(v.name).trim()})` : base.name;
+        const id = (typeof baseId === 'number') ? (baseId * 100) + (idx + 1) : String(baseId) + '-' + String(idx + 1);
+        const found = cart.findIndex(c => c.id === id);
+        if (found >= 0) { cart[found].qty += 1; }
+        else { cart.push({ id, name, price, qty: 1, imageUrl: base.imageUrl || '' }); }
+        renderCart();
+        if (el) {
+            try {
+                const original = el.innerHTML;
+                el.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+                try { lucide.createIcons(); } catch {}
+                setTimeout(() => { el.innerHTML = original; }, 800);
+            } catch {}
+        }
+    };
+
+    // --- Info Modal Logic ---
+    let infoPrevFocus = null;
+    function handleInfoIconError(img) {
+        try {
+            if (img) { img.style.display = 'none'; }
+            const maskEl = img?.closest('button')?.querySelector('.icon-mask');
+            if (maskEl) { maskEl.style.display = 'none'; }
+            const fallback = img?.closest('button')?.querySelector('.fallback');
+            if (fallback) fallback.style.display = 'inline';
+        } catch {}
+        showToast('تعذّر تحميل أيقونة المعلومات');
+    }
+    function renderInfoContent() {
+        try {
+            const brandEl = document.getElementById('navbar-brand');
+            const brand = (brandEl?.textContent || 'مطعم سندريلا').trim();
+            document.getElementById('info-title').textContent = `حول ${brand}`;
+        } catch {}
+        const aboutText = document.getElementById('about-text');
+        const contactEl = document.getElementById('contact-number');
+        const whatsappEl = document.getElementById('whatsapp-number');
+        const locEl = document.getElementById('location-name');
+        const mapEl = document.getElementById('map-link');
+        try {
+            const s = window.settings || {};
+            const defaultAbout = (
+                'أحنا نلتزم بتقديم طعام لذيذ وجودة عالية بأسعار مناسبة وبسيطة.\n'
+              + 'أسعارنا معقولة بحيث تناسب جميع الزبائن وتخليهم يستمتعوا بوجبتهم بدون ما يشعرون بأي ضغط على ميزانيتهم.\n'
+              + 'هدفنا هو تقديم تجربة رائعة تجمع بين الجودة والسعر المناسب.'
+            );
+            aboutText.textContent = s.about || defaultAbout;
+            const cnumRaw = (s.contactNumber || '').trim();
+            const wnumRaw = (s.whatsappNumber || '').trim();
+            const cnum = sanitizePhone(cnumRaw);
+            const wnum = sanitizePhone(wnumRaw);
+            if (cnum) { contactEl.innerHTML = `<a href="tel:${cnum}">${cnumRaw}</a>`; } else { contactEl.textContent = '—'; }
+            if (wnum) { whatsappEl.innerHTML = `<a href="https://wa.me/${wnum}" target="_blank" rel="noopener">${wnumRaw}</a>`; } else { whatsappEl.textContent = '—'; }
+            if (locEl) locEl.textContent = (s.locationName || '—');
+            const url = (s.mapLink || '').trim();
+            if (mapEl) {
+                if (url) { mapEl.textContent = 'فتح الخريطة'; mapEl.href = url; }
+                else { mapEl.textContent = '—'; mapEl.removeAttribute('href'); }
+            }
+            else { mapEl.textContent = '—'; mapEl.removeAttribute('href'); }
+        } catch { /* ignore */ }
+    }
+    function trapFocusInInfo(e) {
+        const overlay = document.getElementById('info-overlay');
+        const panel = document.getElementById('info-panel');
+        if (!overlay || overlay.style.display === 'none') return;
+        if (e.key === 'Escape') { closeInfo(); return; }
+        if (e.key === 'Tab') {
+            const focusables = panel.querySelectorAll('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+            const arr = Array.from(focusables);
+            if (!arr.length) { e.preventDefault(); panel.focus(); return; }
+            const first = arr[0]; const last = arr[arr.length - 1];
+            const active = document.activeElement;
+            if (e.shiftKey) {
+                if (active === first || !panel.contains(active)) { e.preventDefault(); last.focus(); }
+            } else {
+                if (active === last) { e.preventDefault(); first.focus(); }
+            }
+        }
+    }
+    window.openInfo = () => {
+        const overlay = document.getElementById('info-overlay');
+        const panel = document.getElementById('info-panel');
+        if (!overlay || !panel) return;
+        renderInfoContent();
+        infoPrevFocus = document.activeElement;
+        overlay.style.display = 'flex';
+        overlay.classList.remove('hide');
+        overlay.classList.add('show');
+        try { document.body.style.overflow = 'hidden'; } catch{}
+        setTimeout(() => { panel.focus(); }, 50);
+        document.addEventListener('keydown', trapFocusInInfo);
+        try { lucide.createIcons(); } catch {}
+    };
+    window.closeInfo = (ev) => {
+        const overlay = document.getElementById('info-overlay');
+        if (!overlay) return;
+        overlay.classList.remove('show');
+        overlay.classList.add('hide');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.classList.remove('hide');
+        }, 180);
+        try { document.body.style.overflow = ''; } catch{}
+        document.removeEventListener('keydown', trapFocusInInfo);
+        if (infoPrevFocus && typeof infoPrevFocus.focus === 'function') { setTimeout(() => infoPrevFocus.focus(), 50); }
+    };
+
+    // --- FAB Toggle ---
+    function toggleFab() {
+        try {
+            const wrap = document.getElementById('fab-wrap');
+            const mainBtn = document.getElementById('fab-main');
+            if (!wrap || !mainBtn) return;
+            const open = wrap.classList.toggle('open');
+            mainBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        } catch {}
+        try { lucide.createIcons(); } catch {}
+    }
+
+
+    // --- Initialization ---
+    window.onload = async () => {
+        await loadMenuItems();
+        await loadCategories();
+        await loadSettings();
+        await loadAnnouncements();
+        await loadHero();
+        await loadGovernorates();
+        activeCategory = Array.isArray(categories) && categories.length ? categories[0] : '';
+        renderCategoryTabs();
+        renderProducts();
+        // Initialize navbar dynamic title and listeners
+        updateNavbarTitleOnScroll();
+        window.addEventListener('scroll', updateNavbarTitleOnScroll, { passive: true });
+        window.addEventListener('resize', updateNavbarTitleOnScroll);
+        renderGovernorateSelect();
+        renderCart();
+        updateCartBranchSubtitle();
+        try { lucide.createIcons(); } catch {}
+    };
+
+    // --- Cart Logic ---
+    let cart = [];
+    function formatIQD(n) { return `${Number(n||0).toLocaleString('ar-IQ')} د.ع`; }
+    function openCart() { document.getElementById('cart-overlay').style.display = 'block'; try { lucide.createIcons(); } catch {} }
+    function closeCart(ev) { document.getElementById('cart-overlay').style.display = 'none'; }
+function renderCart() {
+        const itemsWrap = document.getElementById('cart-items');
+        const empty = document.getElementById('empty-cart');
+        const totalEl = document.getElementById('cart-total');
+        const total = cart.reduce((s, it) => s + (it.price*it.qty), 0);
+        const deliveryRow = document.getElementById('delivery-fee-row');
+        const deliveryEl = document.getElementById('delivery-fee');
+        const enabled = Array.isArray(governorates) && governorates.length > 0;
+        const fee = enabled ? (Number(selectedGovFee)||0) : 0;
+        if (deliveryRow) deliveryRow.style.display = enabled ? '' : 'none';
+        if (deliveryEl) deliveryEl.textContent = formatIQD(fee);
+        totalEl.textContent = formatIQD(total + fee);
+        // Always update badge and FAB icon/behavior before handling empty/non-empty views
+        try {
+            const count = cart.reduce((s, it) => s + (it.qty||0), 0);
+            const badge = document.getElementById('cart-count-badge');
+            if (badge) {
+                if (count > 0) { badge.textContent = String(count); badge.classList.add('show'); }
+                else { badge.textContent = ''; badge.classList.remove('show'); }
+            }
+
+            const fabMain = document.getElementById('fab-main');
+            if (fabMain) {
+                const iconWrap = document.getElementById('fab-icon');
+                if (iconWrap) {
+                    const lucideAvailable = !!(window && window.lucide);
+                    if (count > 0) {
+                        // Show cart icon when there are items
+                        iconWrap.innerHTML = lucideAvailable
+                            ? `<i data-lucide="shopping-cart" class="w-7 h-7 text-white"></i>`
+                            : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7" style="color:#fff"><circle cx="9" cy="20" r="1.5"></circle><circle cx="17" cy="20" r="1.5"></circle><path d="M3 3h2l2 12h10l3-8H6"/></svg>`;
+                    } else {
+                        // Show white logo when empty
+                        iconWrap.innerHTML = `<img src="app.png" alt="logo" class="fab-logo" />`;
+                    }
+                }
+                fabMain.setAttribute('aria-label', count > 0 ? 'افتح السلة' : 'زر رئيسي');
+                // Click behavior: open cart when has items, toggle when empty
+                try {
+                    const wrap = document.getElementById('fab-wrap');
+                    if (count > 0) {
+                        fabMain.onclick = openCart;
+                        fabMain.setAttribute('aria-expanded', 'false');
+                        if (wrap) wrap.classList.remove('open');
+                    } else {
+                        // Default: keep FAB closed when cart is empty
+                        fabMain.onclick = toggleFab;
+                        fabMain.setAttribute('aria-expanded', 'false');
+                        if (wrap) wrap.classList.remove('open');
+                    }
+                } catch {}
+                try { lucide.createIcons(); } catch {}
+                try { fabMain.classList.add('icon-swap'); setTimeout(() => { fabMain.classList.remove('icon-swap'); }, 220); } catch {}
+            }
+        } catch {}
+        if (!cart.length) {
+            empty.classList.remove('hidden');
+            itemsWrap.classList.add('hidden');
+            itemsWrap.innerHTML = '';
+            return;
+        }
+        empty.classList.add('hidden');
+        itemsWrap.classList.remove('hidden');
+        itemsWrap.innerHTML = cart.map(it => `
+            <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-2xl p-3">
+                <div class="flex items-center gap-3">
+                    <img src="${it.imageUrl || ''}" alt="${it.name}" class="w-12 h-12 rounded-xl object-cover border" onerror="this.style.display='none'" style="${it.imageUrl ? '' : 'display:none;'}" />
+                    <div>
+                        <div class="font-bold">${it.name}</div>
+                        <div class="text-sm text-gray-500">${formatIQD(it.price)} × ${it.qty}</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 rounded-xl bg-white border active:scale-95" onclick="decQty(${it.id})"><i data-lucide="minus" class="w-4 h-4"></i></button>
+                    <button class="p-2 rounded-xl bg-white border active:scale-95" onclick="incQty(${it.id})"><i data-lucide="plus" class="w-4 h-4"></i></button>
+                    <button class="p-2 rounded-xl bg-white border active:scale-95" onclick="removeItem(${it.id})"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        `).join('');
+        try { lucide.createIcons(); } catch {}
+    }
+    window.incQty = (id) => { const it = cart.find(x=>x.id===id); if (it) it.qty += 1; renderCart(); };
+    window.decQty = (id) => { const it = cart.find(x=>x.id===id); if (it && it.qty>1) it.qty -= 1; renderCart(); };
+    window.removeItem = (id) => { cart = cart.filter(x=>x.id!==id); renderCart(); };
+    window.openCart = openCart; window.closeCart = closeCart;
+
+    (function setupGovernorateChange(){
+        const sel = document.getElementById('cust-governorate');
+        if (!sel) return;
+        sel.addEventListener('change', () => {
+            selectedGovName = sel.value || '';
+            const g = governorates.find(x => x.name === selectedGovName);
+            selectedGovFee = g ? (Number(g.fee)||0) : 0;
+            renderCart();
+        });
+    })();
+
+    function buildInvoice() {
+        const name = (document.getElementById('cust-name').value||'').trim();
+        const phone = (document.getElementById('cust-phone').value||'').trim();
+        const address = (document.getElementById('cust-address').value||'').trim();
+        const note = (document.getElementById('cart-note').value||'').trim() || '—';
+        const lines = cart.map(it => ` - ${it.name} x ${it.qty} — ${formatIQD(it.price*it.qty)}`);
+        const total = cart.reduce((s, it) => s + (it.price*it.qty), 0);
+        const gov = selectedGovName || '—';
+        const fee = Number(selectedGovFee)||0;
+        const grand = total + fee;
+        const invoice = [
+            'فاتورة الطلب',
+            'الأصناف:',
+            ...lines,
+            `أجور التوصيل: ${formatIQD(fee)}`,
+            `المجموع مع التوصيل: ${formatIQD(grand)}`,
+            `الاسم: ${name||'—'}`,
+            `الرقم: ${phone||'—'}`,
+            `العنوان: ${address||'—'}`,
+            `المحافظة/المنطقة: ${gov}`,
+            `ملاحظة: ${note}`
+        ].join('\n');
+        return { invoice, name, phone };
+    }
+
+    async function logCustomerSimple(name, phone) {
+        try {
+            const orderNumber = Math.floor(100000 + Math.random()*900000);
+            await fetch('/api/log-customer', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, branch: '', orderNumber })
+            });
+        } catch (e) { /* ignore */ }
+    }
+
+    window.sendOrder = async () => {
+        if (!cart.length) { showToast('سلتك فارغة حالياً'); return; }
+        const { invoice, name, phone } = buildInvoice();
+        await logCustomerSimple(name, phone);
+        try { await navigator.clipboard.writeText(invoice); } catch (e) { /* ignore */ }
+        try { setTimeout(() => { try { sendOrderToGoogleSheets(buildOrderPayload()); } catch {} }, 0); } catch {}
+        const num = sanitizePhone((settings && settings.whatsappNumber) || '');
+        if (settings && settings.ordersEnabled && num) {
+            const link = `https://wa.me/${num}?text=${encodeURIComponent(invoice)}`;
+            let opened = false;
+            try {
+                const w = window.open(link, '_blank');
+                opened = !!w;
+            } catch {}
+            if (!opened) {
+                try { window.location.href = link; opened = true; } catch {}
+            }
+            if (!opened) {
+                try {
+                    const a = document.createElement('a');
+                    a.href = link; a.target = '_self'; a.rel = 'noopener';
+                    document.body.appendChild(a); a.click(); a.remove();
+                    opened = true;
+                } catch {}
+            }
+            showToast(opened ? 'يتم فتح واتساب لإرسال الطلب' : 'انسخ الفاتورة وأرسلها عبر واتساب');
+        } else {
+            showToast('تم نسخ الفاتورة؛ أرسلها عبر واتساب يدوياً');
+        }
+    };
+    window.callOrder = () => {
+        const num = sanitizePhone((settings && settings.contactNumber) || '');
+        window.location.href = num ? `tel:${num}` : 'tel:';
+    };
+
+    // --- Item Preview Logic ---
+    window.previewItemId = null;
+    function openItemPreview(id) {
+        window.previewItemId = id;
+        renderItemPreview();
+        const ov = document.getElementById('item-overlay');
+        ov.style.display = 'block';
+        try { lucide.createIcons(); } catch {}
+    }
+    function closeItemPreview(ev) {
+        document.getElementById('item-overlay').style.display = 'none';
+    }
+    function renderItemPreview() {
+        const it = items.find(p => p.id === window.previewItemId);
+        if (!it) return;
+        const nameEl = document.getElementById('preview-name');
+        const catEl = document.getElementById('preview-category');
+        const imgEl = document.getElementById('preview-image');
+        const descEl = document.getElementById('preview-desc');
+        const priceEl = document.getElementById('preview-price');
+        const variantsEl = document.getElementById('preview-variants');
+        const addBtn = document.getElementById('preview-add-btn');
+        nameEl.textContent = it.name || '';
+        catEl.textContent = it.category || '';
+        descEl.textContent = it.description || '';
+        priceEl.textContent = formatIQD(Number(it.price)||0);
+        if (it.imageUrl) {
+            imgEl.src = it.imageUrl;
+            imgEl.style.display = '';
+        } else {
+            imgEl.style.display = 'none';
+        }
+        const vars = Array.isArray(it.variants) ? it.variants : [];
+        if (variantsEl) {
+            if (vars.length) {
+                try { priceEl.parentElement.style.display = 'none'; } catch {}
+                if (addBtn) addBtn.style.display = 'none';
+                const t = window.currentTheme || {};
+                const addBtnStyle = t.addToCartBgColor ? `background:${t.addToCartBgColor};border-color:${t.addToCartBgColor};` : '';
+                variantsEl.innerHTML = vars.map((v, idx) => `
+                    <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-2">
+                        <div class="flex flex-col items-start leading-tight">
+                            <span class="font-extrabold text-base">${Number(v.price||0).toLocaleString('ar-IQ')} د.ع</span>
+                            <span class="text-xs text-gray-700 mt-1">${String(v.name||'').trim()}</span>
+                        </div>
+                        <button class="px-2 py-1 rounded-lg text-white text-sm active:scale-95" style="${addBtnStyle}" onclick="addVariantToCart(${it.id}, ${idx}, this); event.stopPropagation();">+</button>
+                    </div>
+                `).join('');
+            } else {
+                try { priceEl.parentElement.style.display = ''; } catch {}
+                if (addBtn) addBtn.style.display = '';
+                variantsEl.innerHTML = '';
+            }
+        }
+    }
+
+    function buildOrderPayload() {
+        const name = (document.getElementById('cust-name').value||'').trim();
+        const phone = sanitizePhone((document.getElementById('cust-phone').value||'').trim());
+        const total = cart.reduce((s, it) => s + (it.price*it.qty), 0);
+        const fee = Number(selectedGovFee)||0;
+        const grand = total + fee;
+        const branchId = (window.settings && window.settings.branchId) || '';
+        const branchName = (window.settings && window.settings.locationName) || '';
+        const items = cart.map(it => ({ name: it.name, qty: Number(it.qty)||0, unitPrice: Number(it.price)||0, subtotal: Number(it.price||0)*(Number(it.qty)||0) }));
+        const signature = [phone, branchId, grand, items.map(i=>i.name+':'+i.qty).join(',')].join('|');
+        const submissionId = 'ord-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
+        return { type:'order', customerName:name, customerPhone:phone, branchId, branchName, total, deliveryFee:fee, grandTotal:grand, items, timestamp:new Date().toISOString(), submissionId, signature };
+    }
+
+    async function sendOrderToGoogleSheets(payloadObj) {
+        try {
+            const hook = window.GS_ORDER_WEBHOOK_URL || '';
+            if (!hook) return false;
+            try {
+                const key = 'sent_order_sig_'+String(payloadObj.signature||'');
+                try { if (localStorage.getItem(key)==='1') return true; localStorage.setItem(key,'1'); } catch {}
+                const resp = await fetch('/api/forward-webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: hook, data: payloadObj }), keepalive: true });
+                if (resp.ok) return true;
+            } catch {}
+            try {
+                const payload = JSON.stringify(payloadObj);
+                const blob = new Blob([payload], { type: 'application/json' });
+                try { if (navigator.sendBeacon) { navigator.sendBeacon(hook, blob); return true; } } catch {}
+            } catch {}
+            try {
+                const payload = JSON.stringify(payloadObj);
+                fetch(hook, { method: 'POST', body: payload, mode: 'no-cors', keepalive: true }).catch(()=>{});
+                return true;
+            } catch {}
+            try {
+                const q = (hook.includes('?') ? '&' : '?') + 'payload=' + encodeURIComponent(JSON.stringify(payloadObj)) + '&t=' + Date.now();
+                const img = new Image();
+                img.src = hook + q;
+                return true;
+            } catch {}
+            return false;
+        } catch { return false; }
+    }
+
+</script>
+
+</body>
+</html>

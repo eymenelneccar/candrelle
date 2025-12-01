@@ -1,0 +1,427 @@
+[
+  {
+    "id": 1763388308040,
+    "name": "بيتزا بيبروني",
+    "category": "بيتزا",
+    "price": 0,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1259.jpeg",
+    "variants": [
+      {
+        "name": "صغير",
+        "price": 6000
+      },
+      {
+        "name": "كبير",
+        "price": 8000
+      },
+      {
+        "name": "عائلي",
+        "price": 12000
+      }
+    ]
+  },
+  {
+    "id": 1763388329128,
+    "name": "بيتزا دجاج",
+    "category": "بيتزا",
+    "price": 0,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1258.jpeg",
+    "variants": [
+      {
+        "name": "صغير ",
+        "price": 6000
+      },
+      {
+        "name": "كبير",
+        "price": 8000
+      },
+      {
+        "name": "عائلي",
+        "price": 12000
+      }
+    ]
+  },
+  {
+    "id": 1763388347406,
+    "name": "بيتزا مارغريتا",
+    "category": "بيتزا",
+    "price": 0,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1257.jpeg",
+    "variants": [
+      {
+        "name": "صغير ",
+        "price": 5000
+      },
+      {
+        "name": "كبير ",
+        "price": 7000
+      },
+      {
+        "name": "عائلي ",
+        "price": 10000
+      }
+    ]
+  },
+  {
+    "id": 1763388323228,
+    "name": "ستربس 4x",
+    "category": "كنتاكي",
+    "price": 5000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1261.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388276616,
+    "name": "كنتاكي 3x",
+    "category": "كنتاكي",
+    "price": 6000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1260.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388311064,
+    "name": "كنتاكي 6x",
+    "category": "كنتاكي",
+    "price": 12000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1260.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388286678,
+    "name": "كنتاكي 10x",
+    "category": "كنتاكي",
+    "price": 18000,
+    "description": "مع بطل بيبسي كبير",
+    "imageUrl": "assets/images/IMG_1260.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388361166,
+    "name": "زنگر",
+    "category": "سندويشات",
+    "price": 3000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1283.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388319890,
+    "name": "زنگر جبن",
+    "category": "سندويشات",
+    "price": 3500,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1283.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388334101,
+    "name": "بركر جبن",
+    "category": "سندويشات",
+    "price": 3500,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1285.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388328084,
+    "name": "برگر",
+    "category": "سندويشات",
+    "price": 3000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1285.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388266547,
+    "name": "تويستر جبن",
+    "category": "سندويشات",
+    "price": 3000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1284.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388278513,
+    "name": "صاج دجاج",
+    "category": "صاج",
+    "price": 1500,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1264.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388311585,
+    "name": "طبق صاج دجاج",
+    "category": "صاج",
+    "price": 6000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1262.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388283110,
+    "name": "قدح فنكر",
+    "category": "فنكر",
+    "price": 1000,
+    "description": "",
+    "imageUrl": ""
+  },
+  {
+    "id": 1763388352965,
+    "name": "صحن فنكر جبن",
+    "category": "فنكر",
+    "price": 2000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1265.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388274949,
+    "name": "صحن فنكر جبن كبير",
+    "category": "فنكر",
+    "price": 3000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1266.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388291273,
+    "name": "ريزو صغير",
+    "category": "ريزو",
+    "price": 4000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1280.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388347919,
+    "name": "ريزو بلاس",
+    "category": "ريزو",
+    "price": 5000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1282.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388318302,
+    "name": "ريزو جبن صغير",
+    "category": "ريزو",
+    "price": 5000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1281.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388283549,
+    "name": "ريزو جبن بلاس",
+    "category": "ريزو",
+    "price": 6000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1279.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388335961,
+    "name": "ريزو مدخن",
+    "category": "ريزو",
+    "price": 0,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1286.jpeg",
+    "variants": [
+      {
+        "name": "صغير ",
+        "price": 4000
+      },
+      {
+        "name": "كبير ",
+        "price": 5000
+      }
+    ]
+  },
+  {
+    "id": 1763388300042,
+    "name": "قطعة كنتاكي",
+    "category": "الاضافات",
+    "price": 1500,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1267.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388305138,
+    "name": "قطعة ستربس",
+    "category": "الاضافات",
+    "price": 1000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1268.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388323793,
+    "name": "بيبسي",
+    "category": "الاضافات",
+    "price": 500,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1273.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388356185,
+    "name": "ماء",
+    "category": "الاضافات",
+    "price": 250,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1275.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388337530,
+    "name": "ثومية",
+    "category": "الاضافات",
+    "price": 250,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1276.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388353171,
+    "name": "صوص سبایسی",
+    "category": "الاضافات",
+    "price": 250,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1277.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388342690,
+    "name": "صمون 4 قطع",
+    "category": "الاضافات",
+    "price": 500,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1271.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388342443,
+    "name": "حمص بطحينة",
+    "category": "المقبلات",
+    "price": 1000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1290.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388345930,
+    "name": "بيتنجانية",
+    "category": "المقبلات",
+    "price": 1000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1288.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388271181,
+    "name": "جاجيك",
+    "category": "المقبلات",
+    "price": 1000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1289.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388273710,
+    "name": "سلطة روسية",
+    "category": "المقبلات",
+    "price": 1000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1287.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388267873,
+    "name": "وجبة فريندز",
+    "category": "وجبات التوفير",
+    "price": 11000,
+    "description": "زنگر 3 قطع - فنكر 3 قطع- ببسي 3 حبات",
+    "imageUrl": "assets/images/IMG_1292.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388315233,
+    "name": "وجبة بك فاميلي",
+    "category": "وجبات التوفير",
+    "price": 16000,
+    "description": "بيتزا دجاج - كنتاكي 3 قطع + طبق ریزو ، فنگر جبن",
+    "imageUrl": "assets/images/IMG_1291.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388312960,
+    "name": "وجبة كرسبي التوفير",
+    "category": "وجبات التوفير",
+    "price": 12000,
+    "description": "کنتاکی 3 قطع ، ستربس 4 قطع - زنگر",
+    "imageUrl": "assets/images/IMG_1293.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388276197,
+    "name": "وجبة سندريلا",
+    "category": "وجبات التوفير",
+    "price": 10000,
+    "description": "طبق ريزو - بركر - زنكر - فنكر جبن",
+    "imageUrl": "assets/images/IMG_1294.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388286327,
+    "name": "وجبة بيتزا دجاج",
+    "category": "وجبات التوفير",
+    "price": 10000,
+    "description": "2 بيتزا دجاج",
+    "imageUrl": "assets/images/IMG_1295.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388310118,
+    "name": "وجبة تيستي",
+    "category": "وجبات التوفير",
+    "price": 11000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1296.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388280492,
+    "name": "عرض ريزو صغير",
+    "category": "وجبات التوفير",
+    "price": 11000,
+    "description": "",
+    "imageUrl": "assets/images/IMG_1297.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388324803,
+    "name": "عرض ريزو بلاس",
+    "category": "وجبات التوفير",
+    "price": 13000,
+    "description": "ريزو كبير 3 اطباق",
+    "imageUrl": "assets/images/IMG_1298.jpeg",
+    "variants": []
+  },
+  {
+    "id": 1763388283382,
+    "name": "وجبه حبايبنا",
+    "category": "وجبات التوفير",
+    "price": 24000,
+    "description": "وجبة حبايبنا بيتزا كبير + 4 قطع ستربس + فنكر بالجبن 3 قطع كتاكي + ريزو + بيبسي عائلي",
+    "imageUrl": "assets/images/IMG_1299.jpeg",
+    "variants": []
+  }
+]

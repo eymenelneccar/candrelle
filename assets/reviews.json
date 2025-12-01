@@ -1,0 +1,103 @@
+[
+  {
+    "type": "service",
+    "serviceRating": 5,
+    "comment": "?????? ?????",
+    "customerName": "????",
+    "customerPhone": "07701234567",
+    "timestamp": "2025-11-07T10:00:00Z"
+  },
+  {
+    "type": "service",
+    "serviceRating": 3,
+    "comment": "SDFSDFSDF",
+    "customerName": "HSLK",
+    "customerPhone": "21002020",
+    "timestamp": "2025-11-09T07:52:57.814Z"
+  },
+  {
+    "type": "service",
+    "serviceRating": 3,
+    "comment": "SDFSDFSDF",
+    "customerName": "SDFDS",
+    "customerPhone": "42525272",
+    "timestamp": "2025-11-09T07:53:18.808Z"
+  },
+  {
+    "type": "service",
+    "serviceRating": 4,
+    "comment": "?????? ??? ???????",
+    "customerName": "???",
+    "customerPhone": "07701234567",
+    "timestamp": "2025-11-09T10:10:00Z"
+  },
+  {
+    "type": "service",
+    "serviceRating": 4,
+    "comment": "?????? ??? ???????-1",
+    "customerName": "???",
+    "customerPhone": "07701234567",
+    "timestamp": "2025-11-09T10:20:00Z",
+    "submissionId": "dup-test-002"
+  },
+  {
+    "type": "service",
+    "serviceRating": 3,
+    "comment": "لاتةة",
+    "customerName": "يبلا",
+    "customerPhone": "572453453",
+    "timestamp": "2025-11-09T07:58:04.037Z",
+    "submissionId": "617d0f19-801e-4d6b-a3da-7fc13c2f194d",
+    "forwarded": true,
+    "forwardedAt": "2025-11-09T07:58:06Z",
+    "forwardStatus": 200
+  },
+  {
+    "type": "service",
+    "serviceRating": 5,
+    "comment": "?????? ?????-?????",
+    "customerName": "????",
+    "customerPhone": "07701234568",
+    "timestamp": "2025-11-09T10:22:00Z",
+    "submissionId": "forward-test-003",
+    "forwarded": true,
+    "forwardedAt": "2025-11-09T07:58:41Z",
+    "forwardStatus": 200
+  },
+  {
+    "type": "service",
+    "serviceRating": 4,
+    "comment": "سيلا",
+    "customerName": "سب",
+    "customerPhone": "5120320",
+    "timestamp": "2025-11-09T16:50:35.358Z",
+    "submissionId": "e8bfcd7d-d3dd-4190-92e4-2d62ec169e8b",
+    "forwarded": true,
+    "forwardedAt": "2025-11-09T16:50:39Z",
+    "forwardStatus": 200
+  },
+  {
+    "type": "service",
+    "serviceRating": 4,
+    "comment": "ريشسريس",
+    "customerName": "بثصل",
+    "customerPhone": "22525235332",
+    "timestamp": "2025-11-09T16:58:31.976Z",
+    "submissionId": "d470936b-06c1-421f-ab59-39ade62d59b5",
+    "forwarded": true,
+    "forwardedAt": "2025-11-09T16:58:35Z",
+    "forwardStatus": 200
+  },
+  {
+    "type": "service",
+    "serviceRating": 3,
+    "comment": "سيل",
+    "customerName": "سثب",
+    "customerPhone": "32535325",
+    "timestamp": "2025-11-09T17:07:31.007Z",
+    "submissionId": "fb918369-9bf8-4401-9ec3-50bebdcf5d02",
+    "forwarded": true,
+    "forwardedAt": "2025-11-09T17:07:35Z",
+    "forwardStatus": 200
+  }
+]
